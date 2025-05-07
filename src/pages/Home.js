@@ -301,6 +301,109 @@ const ViewAllButtonWrapper = styled(motion.div)`
   }
 `;
 
+// Add new styled components for the CR section
+const CRSectionWrapper = styled(motion.div)`
+  position: relative;
+  padding: 4rem 0;
+  overflow: hidden;
+  text-align: center;
+  
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(15, 15, 15, 0.9), rgba(20, 20, 20, 0.8));
+    z-index: -1;
+  }
+`;
+
+const CRTitle = styled(motion.h2)`
+  color: #FFFFFF;
+  font-size: 2.5rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 1rem;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  position: relative;
+  display: inline-block;
+  letter-spacing: 0.5px;
+  
+  &:after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: #E50914;
+    box-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
+    border-radius: 2px;
+  }
+`;
+
+const CRSubtitle = styled(motion.p)`
+  color: #B3B3B3;
+  font-size: 1.1rem;
+  text-align: center;
+  max-width: 700px;
+  margin: 1.5rem auto 2rem;
+  line-height: 1.5;
+  font-weight: 300;
+`;
+
+const CRCardsContainer = styled(motion.div)`
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+  }
+`;
+
+const CRCardWrapper = styled(motion.div)`
+  position: relative;
+  transition: transform 0.3s ease;
+  
+  &:after {
+    content: '';
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 5px;
+    background: radial-gradient(ellipse at center, rgba(229, 9, 20, 0.5) 0%, rgba(229, 9, 20, 0) 70%);
+    filter: blur(5px);
+    opacity: 0.6;
+  }
+`;
+
+const CRLabelBadge = styled(motion.div)`
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #E50914, #B20710);
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 0.5rem 1.5rem;
+  border-radius: 4px;
+  box-shadow: 0 4px 15px rgba(229, 9, 20, 0.3);
+  z-index: 10;
+  white-space: nowrap;
+`;
+
 const Home = () => {
   const { playSound } = useContext(SoundContext);
   const [isIntroComplete, setIsIntroComplete] = useState(false);
@@ -330,6 +433,9 @@ const Home = () => {
     triggerOnce: true
   });
   
+  // Add state for class representatives
+  const [classReps, setClassReps] = useState([]);
+  
   // Handle intro video completion
   const handleIntroComplete = () => {
     setIsIntroComplete(true);
@@ -348,6 +454,15 @@ const Home = () => {
       // If featuredStudents is not available or not an array, use an empty array
       console.error('featuredStudents is not an array or is undefined');
       setStudents([]);
+    }
+  }, []);
+  
+  useEffect(() => {
+    // Filter out the class representatives from the students data
+    if (featuredStudents && Array.isArray(featuredStudents)) {
+      const crs = featuredStudents.filter(student => student.role === 'CR');
+      console.log('Class representatives:', crs);
+      setClassReps(crs);
     }
   }, []);
   
@@ -426,6 +541,72 @@ const Home = () => {
       
       {/* Hero Section */}
       <Hero />
+      
+      {/* Class Representatives Section */}
+      <SectionWrapper
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+      >
+        <CRSectionWrapper>
+          <motion.div variants={itemVariants}>
+            <CRTitle>Class Representatives</CRTitle>
+            <CRSubtitle>
+              Meet the dedicated student leaders of EEE '23 Section A who represent and support our class.
+            </CRSubtitle>
+          </motion.div>
+          
+          <CRCardsContainer variants={containerVariants}>
+            {classReps && classReps.length > 0 ? 
+              classReps.map((cr, index) => (
+                <CRCardWrapper 
+                  key={cr?.id || `cr-${index}`} 
+                  variants={itemVariants}
+                  whileHover={{ y: -15, transition: { duration: 0.3 } }}
+                >
+                  <CRLabelBadge
+                    initial={{ y: -10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.3 + (index * 0.1), duration: 0.5 }}
+                  >
+                    Class Representative
+                  </CRLabelBadge>
+                  <StudentCard student={cr} />
+                </CRCardWrapper>
+              )) : (
+                <motion.div variants={itemVariants}>
+                  <CRCardWrapper whileHover={{ y: -15, transition: { duration: 0.3 } }}>
+                    <CRLabelBadge>Class Representative</CRLabelBadge>
+                    <StudentCard 
+                      student={{
+                        id: "2301019",
+                        name: "ABDUL BAKEU BORSHON",
+                        role: "CR",
+                        image: "/assets/images/avatar/avatar-19.jpg"
+                      }} 
+                    />
+                  </CRCardWrapper>
+                </motion.div>
+              )}
+              
+              {(!classReps || classReps.length < 2) && (
+                <motion.div variants={itemVariants}>
+                  <CRCardWrapper whileHover={{ y: -15, transition: { duration: 0.3 } }}>
+                    <CRLabelBadge>Class Representative</CRLabelBadge>
+                    <StudentCard 
+                      student={{
+                        id: "2301054",
+                        name: "TAHMIDUL HAQUE SAIF",
+                        role: "CR",
+                        image: "/assets/images/avatar/avatar-54.jpg"
+                      }} 
+                    />
+                  </CRCardWrapper>
+                </motion.div>
+              )}
+          </CRCardsContainer>
+        </CRSectionWrapper>
+      </SectionWrapper>
       
       {/* Replace the Features Section with our new PremiumFeatureSection */}
       <PremiumFeatureSection />
