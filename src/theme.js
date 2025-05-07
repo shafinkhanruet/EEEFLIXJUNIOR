@@ -118,6 +118,7 @@ export const darkTheme = {
     bounce: '0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
   },
   breakpoints: {
+    smallMobile: '375px',
     mobile: '576px',
     tablet: '768px',
     laptop: '992px',
@@ -291,5 +292,29 @@ export const darkTheme = {
         pointerEvents: 'none'
       }
     }
-  }
+  },
+  
+  // Mobile specific optimizations
+  mobile: {
+    touchTargetSize: '44px',
+    edgePadding: '15px',
+    navbarHeight: '60px',
+    reducedMotion: {
+      transition: '0.1s ease',
+      transform: 'none',
+      animation: 'none'
+    },
+    safePadding: {
+      paddingBottom: 'env(safe-area-inset-bottom)',
+      paddingTop: 'env(safe-area-inset-top)',
+      paddingLeft: 'env(safe-area-inset-left)',
+      paddingRight: 'env(safe-area-inset-right)'
+    },
+    performance: {
+      willChange: 'transform',
+      backfaceVisibility: 'hidden',
+      perspective: '1000px',
+      transform: 'translateZ(0)',
+    }
+  },
 };

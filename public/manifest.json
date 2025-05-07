@@ -1,6 +1,34 @@
 {
-  "short_name": "EEEFlix",
   "name": "EEEFlix - Premium EEE Platform",
+  "short_name": "EEEFlix",
+  "theme_color": "#E50914",
+  "background_color": "#000000",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "description": "A Netflix-inspired platform for connecting EEE students at RUET",
+  "dir": "ltr",
+  "lang": "en-US",
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "categories": ["education", "networking", "social"],
+  "screenshots": [
+    {
+      "src": "assets/screenshots/mobile-home.jpg",
+      "sizes": "750x1334",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Home Screen"
+    },
+    {
+      "src": "assets/screenshots/mobile-students.jpg",
+      "sizes": "750x1334",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Students Screen"
+    }
+  ],
   "icons": [
     {
       "src": "favicon.ico",
@@ -10,16 +38,30 @@
     {
       "src": "logo192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     },
     {
       "src": "logo512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#121212"
+  "shortcuts": [
+    {
+      "name": "Students",
+      "short_name": "Students",
+      "description": "View student profiles",
+      "url": "/students",
+      "icons": [{ "src": "assets/icons/students.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Contact",
+      "short_name": "Contact",
+      "description": "Contact EEEFlix team",
+      "url": "/contact",
+      "icons": [{ "src": "assets/icons/contact.png", "sizes": "96x96" }]
+    }
+  ]
 }

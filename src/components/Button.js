@@ -22,6 +22,14 @@ const ButtonStyles = `
   will-change: transform;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
   
+  /* Improved touch target for mobile */
+  @media (max-width: 576px) {
+    padding: 0.9rem 1.6rem;
+    min-height: 44px;
+    font-size: 0.95rem;
+    border-radius: 6px; /* Slightly larger radius for mobile */
+  }
+  
   &:before {
     content: '';
     position: absolute;
@@ -41,6 +49,20 @@ const ButtonStyles = `
   
   &:hover:before {
     left: 100%;
+  }
+  
+  /* For devices that support hover */
+  @media (hover: hover) {
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+  
+  /* For touch devices */
+  @media (hover: none) {
+    &:active {
+      transform: scale(0.98);
+    }
   }
   
   span {
@@ -92,6 +114,35 @@ const ButtonScanline = styled(motion.div)`
   opacity: 0;
   z-index: 1;
   pointer-events: none;
+`;
+
+// Add touch feedback style
+const TouchRipple = styled.span`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 100%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  animation: touchRipple 0.5s linear;
+  z-index: 3;
+  pointer-events: none;
+  
+  @keyframes touchRipple {
+    0% {
+      opacity: 0.6;
+      width: 0;
+      height: 0;
+    }
+    100% {
+      opacity: 0;
+      width: 200px;
+      height: 200px;
+    }
+  }
 `;
 
 const StyledButton = styled(motion.button)`
@@ -264,10 +315,14 @@ const Button = ({
   onMouseEnter,
   icon,
   iconPosition = 'left',
+  mobileFriendly = true,
   ...props 
 }) => {
-  const [ripples, setRipples] = useState([]);
+  const [rippleArray, setRippleArray] = useState([]);
   const [isHovered, setIsHovered] = useState(false);
+  const [showScanline, setShowScanline] = useState(false);
+  const [touchRipple, setTouchRipple] = useState(null);
+  const buttonRef = React.useRef(null);
   
   const buttonVariants = {
     initial: { scale: 1 },
@@ -298,6 +353,11 @@ const Button = ({
   };
   
   const handleRipple = (e) => {
+    // Skip complex animations on mobile for better performance
+    if (window.matchMedia('(max-width: 576px)').matches && !mobileFriendly) {
+      return;
+    }
+    
     const button = e.currentTarget;
     const rect = button.getBoundingClientRect();
     const size = Math.max(rect.width, rect.height) * 2;
@@ -311,17 +371,38 @@ const Button = ({
       size
     };
     
-    setRipples([...ripples, newRipple]);
+    setRippleArray([...rippleArray, newRipple]);
     
     // Clean up ripples after animation completes
     setTimeout(() => {
-      setRipples(prevRipples => prevRipples.filter(r => r.id !== newRipple.id));
+      setRippleArray(prevRipples => prevRipples.filter(r => r.id !== newRipple.id));
     }, 600);
   };
   
+  // Add touch feedback
+  const handleTouchStart = (e) => {
+    if (!mobileFriendly || disabled) return;
+    
+    const rect = e.currentTarget.getBoundingClientRect();
+    const touchX = e.touches[0].clientX - rect.left;
+    const touchY = e.touches[0].clientY - rect.top;
+    
+    setTouchRipple({
+      id: Math.random(),
+      x: touchX,
+      y: touchY
+    });
+    
+    setTimeout(() => {
+      setTouchRipple(null);
+    }, 500);
+  };
+  
   const handleClick = (e) => {
+    if (!disabled && onClick) {
+      onClick(e);
+    }
     handleRipple(e);
-    if (onClick) onClick(e);
   };
   
   const handleMouseEnter = (e) => {
@@ -340,38 +421,46 @@ const Button = ({
         {children}
         {icon && iconPosition === 'right' && icon}
       </span>
-      <ButtonGlow />
-      <ButtonGrid />
-      <AnimatePresence>
-        {isHovered && (
-          <ButtonScanline
-            variants={scanlineVariants}
-            initial="initial"
-            animate="hover"
-            exit="exit"
-          />
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {ripples.map((ripple) => (
-          <Ripple
-            key={ripple.id}
-            style={{
-              left: ripple.x,
-              top: ripple.y,
-              width: ripple.size,
-              height: ripple.size,
-            }}
-            initial={{ scale: 0, opacity: 0.7 }}
-            animate={{ scale: 4, opacity: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8 }}
-            onAnimationComplete={() => {
-              setRipples((prev) => prev.filter((r) => r.id !== ripple.id));
-            }}
-          />
-        ))}
-      </AnimatePresence>
+      
+      {/* Animated elements for desktop */}
+      {!disabled && (
+        <>
+          <ButtonGlow animate={{ opacity: isHovered ? 0.4 : 0 }} />
+          <ButtonGrid style={{ opacity: isHovered ? 0.8 : 0 }} />
+          <AnimatePresence>
+            {showScanline && (
+              <ButtonScanline
+                initial={{ top: 0, opacity: 0 }}
+                animate={{ top: '100%', opacity: 0.7 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1, ease: 'linear' }}
+              />
+            )}
+          </AnimatePresence>
+          <AnimatePresence>
+            {rippleArray.map(({ x, y, size, id }) => (
+              <Ripple
+                key={id}
+                style={{ left: x, top: y }}
+                initial={{ width: 0, height: 0, opacity: 0.6 }}
+                animate={{ width: size, height: size, opacity: 0 }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+                exit={{ opacity: 0 }}
+              />
+            ))}
+          </AnimatePresence>
+          
+          {/* Touch ripple for mobile */}
+          {touchRipple && (
+            <TouchRipple
+              style={{
+                left: touchRipple.x,
+                top: touchRipple.y
+              }}
+            />
+          )}
+        </>
+      )}
     </>
   );
   

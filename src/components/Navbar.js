@@ -50,6 +50,10 @@ const NavContent = styled.div`
   max-width: 1400px;
   margin: 0 auto;
   transition: all 0.3s ease;
+  
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    padding: ${props => props.scrolled ? '0.8rem 15px' : '1rem 15px'};
+  }
 `;
 
 const Logo = styled(Link)`
@@ -62,6 +66,11 @@ const Logo = styled(Link)`
   &:hover img {
     filter: drop-shadow(0 4px 12px rgba(229, 9, 20, 0.7));
     transform: scale(1.05);
+  }
+  
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    transform: scale(0.85);
+    transform-origin: left center;
   }
 `;
 
@@ -154,6 +163,8 @@ const MobileMenuButton = styled(motion.button)`
     justify-content: center;
     flex-wrap: wrap;
     padding: 12px;
+    width: 52px;
+    height: 52px;
   }
   
   // Hide the original icons
@@ -216,6 +227,7 @@ const MobileMenu = styled(motion.div)`
   right: 0;
   width: 100%;
   height: 100vh;
+  height: 100dvh; /* Use dynamic viewport height for better mobile support */
   background: rgba(10, 10, 20, 0.95);
   backdrop-filter: blur(20px);
   display: flex;
@@ -223,6 +235,8 @@ const MobileMenu = styled(motion.div)`
   justify-content: center;
   align-items: center;
   z-index: 100;
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-top: env(safe-area-inset-top);
   
   &:before {
     content: '';
@@ -243,24 +257,25 @@ const MobileNavLinks = styled.div`
   text-align: center;
   position: relative; 
   z-index: 1;
+  
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    gap: 2.2rem;
+    width: 90%;
+  }
 `;
 
 const MobileNavLink = styled(NavLink)`
   font-size: 1.5rem;
   padding: 1rem 2.5rem;
-  background: ${props => props.active ? 'rgba(229, 9, 20, 0.15)' : 'rgba(255, 255, 255, 0.03)'};
-  border-radius: 8px;
-  box-shadow: ${props => props.active 
-    ? '0 8px 20px rgba(229, 9, 20, 0.2), inset 0 0 0 1px rgba(229, 9, 20, 0.3)' 
-    : '0 6px 15px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.05)'
-  };
   
-  &:hover {
-    transform: translateY(-3px) scale(1.02);
-    background: ${props => props.active 
-      ? 'rgba(229, 9, 20, 0.2)' 
-      : 'rgba(255, 255, 255, 0.05)'
-    };
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    font-size: 1.4rem;
+    padding: 1.2rem;
+    width: 100%;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 `;
 

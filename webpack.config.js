@@ -3,6 +3,7 @@ const CompressionPlugin = require('compression-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   // Enable production mode for optimizations
@@ -29,28 +30,68 @@ module.exports = {
         terserOptions: {
           compress: {
             drop_console: true, // Remove console.log in production
+            passes: 2, // Additional compression passes
+            ecma: 2020, // Use modern JS features for better minification
           },
           mangle: true,
+          format: {
+            comments: false, // Remove all comments
+          },
         },
         extractComments: false,
       }),
       // CSS minification
-      new CssMinimizerPlugin(),
+      new CssMinimizerPlugin({
+        minimizerOptions: {
+          preset: [
+            'default',
+            {
+              discardComments: { removeAll: true },
+              reduceIdents: false, // Prevents breaking keyframe animations
+              colormin: true, // Minify colors
+              convertValues: true, // Convert values when possible
+            },
+          ],
+        },
+      }),
     ],
-    // Code splitting configuration
+    // Code splitting configuration - Optimized for mobile
     splitChunks: {
       chunks: 'all',
-      maxInitialRequests: Infinity,
-      minSize: 20000, // 20kb minimum size to create a chunk
+      maxInitialRequests: 15, // Allow more initial requests for smaller chunks
+      minSize: 15000, // 15kb minimum size to create a chunk
+      maxSize: 200000, // 200kb maximum size to maintain smaller chunks
       cacheGroups: {
+        framework: {
+          test: /[\\/]node_modules[\\/](react|react-dom|react-router-dom)[\\/]/,
+          name: 'framework',
+          priority: 40,
+          enforce: true,
+        },
+        animations: {
+          test: /[\\/]node_modules[\\/](framer-motion)[\\/]/,
+          name: 'animations',
+          priority: 30,
+        },
+        ui: {
+          test: /[\\/]node_modules[\\/](styled-components|react-icons)[\\/]/,
+          name: 'ui',
+          priority: 20,
+        },
         vendor: {
           test: /[\\/]node_modules[\\/]/,
           name(module) {
             // Get the package name
             const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
             // Create a clean package name for better readability
-            return `npm.${packageName.replace('@', '')}`;
+            return `vendor.${packageName.replace('@', '')}`;
           },
+          priority: 10,
+        },
+        common: {
+          minChunks: 2,
+          priority: 5,
+          reuseExistingChunk: true,
         },
       },
     },
@@ -67,23 +108,41 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/preset-env', '@babel/preset-react'],
+            presets: [
+              ['@babel/preset-env', {
+                useBuiltIns: 'usage',
+                corejs: 3,
+                targets: {
+                  esmodules: true,
+                  browsers: ['>0.2%', 'not dead', 'not op_mini all']
+                }
+              }],
+              '@babel/preset-react'
+            ],
             plugins: ['@babel/plugin-transform-runtime'],
           },
         },
       },
-      // CSS processing
+      // CSS processing with MiniCssExtractPlugin for better performance
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: false
+            }
+          }
+        ],
       },
-      // Image optimization
+      // Image optimization - Enhanced for responsive loading
       {
         test: /\.(png|jpg|jpeg|gif|svg|webp)$/i,
         type: 'asset',
         parser: {
           dataUrlCondition: {
-            maxSize: 8 * 1024, // 8kb - inline smaller images as data URLs
+            maxSize: 4 * 1024, // 4kb - inline smaller images as data URLs
           },
         },
         generator: {
@@ -99,6 +158,7 @@ module.exports = {
               },
               optipng: {
                 enabled: true,
+                optimizationLevel: 7
               },
               pngquant: {
                 quality: [0.65, 0.90],
@@ -106,10 +166,17 @@ module.exports = {
               },
               gifsicle: {
                 interlaced: false,
+                optimizationLevel: 3
               },
               webp: {
                 quality: 75,
               },
+              svgo: {
+                plugins: [
+                  { removeViewBox: false },
+                  { removeEmptyAttrs: true }
+                ]
+              }
             },
           },
         ],
@@ -122,7 +189,7 @@ module.exports = {
           filename: 'assets/fonts/[name].[hash][ext]',
         },
       },
-      // Audio files
+      // Audio files - Optimized for mobile
       {
         test: /\.(mp3|wav)$/i,
         type: 'asset/resource',
@@ -135,6 +202,11 @@ module.exports = {
   
   // Plugins
   plugins: [
+    // Extract CSS into separate files for better loading
+    new MiniCssExtractPlugin({
+      filename: 'assets/css/[name].[contenthash].css',
+      chunkFilename: 'assets/css/[id].[contenthash].css',
+    }),
     // Enable GZIP compression
     new CompressionPlugin({
       algorithm: 'gzip',
@@ -149,8 +221,8 @@ module.exports = {
   // Performance hints
   performance: {
     hints: 'warning',
-    maxEntrypointSize: 512000, // 500kb
-    maxAssetSize: 512000, // 500kb
+    maxEntrypointSize: 244000, // 244kb - target for mobile
+    maxAssetSize: 244000, // 244kb - target for mobile
   },
   
   // Development server configuration

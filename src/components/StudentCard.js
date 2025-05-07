@@ -26,6 +26,29 @@ const CardContainer = styled(motion.div)`
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
   isolation: isolate;
+  
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    width: 250px;
+    height: 370px;
+  }
+  
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    width: 220px;
+    height: 340px;
+    border-radius: 18px;
+    
+    /* Mobile optimizations for better performance */
+    box-shadow: 
+      0 10px 20px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+  
+  @media (max-width: ${props => props.theme.breakpoints.smallMobile}) {
+    width: 100%;
+    min-width: 160px;
+    max-width: 200px;
+    height: 320px;
+  }
 
   &:before {
     content: '';
@@ -121,6 +144,16 @@ const CardContainer = styled(motion.div)`
     }
     50% {
       filter: brightness(1.3) blur(2px);
+    }
+  }
+
+  /* Add specific mobile hover effects */
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    &:hover, &:active {
+      transform: translateY(-8px) scale(1.01);
+      box-shadow: 
+        0 15px 30px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(229, 9, 20, 0.3);
     }
   }
 `;
@@ -467,19 +500,30 @@ const StudentCard = ({ student, delay = 0, playSound }) => {
   };
 
   const handleMouseMove = (e) => {
-    if (!cardRef.current) return;
+    if (window.matchMedia('(max-width: 576px)').matches) {
+      // Skip complex effects on mobile for better performance
+      return;
+    }
     
-    const rect = cardRef.current.getBoundingClientRect();
+    const rect = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
     
-    cardRef.current.style.setProperty('--mouse-x', `${x}%`);
-    cardRef.current.style.setProperty('--mouse-y', `${y}%`);
-    setMousePosition({ x, y });
+    e.currentTarget.style.setProperty('--mouse-x', `${x}%`);
+    e.currentTarget.style.setProperty('--mouse-y', `${y}%`);
+    
+    const isBottomHalf = y > 60;
+    if (isBottomHalf !== isBottomHovered) {
+      setIsBottomHovered(isBottomHalf);
+    }
+  };
 
-    // Check if mouse is in the bottom area
-    const isInBottomArea = y > 70;
-    setIsBottomHovered(isInBottomArea);
+  // Add touch event handler
+  const handleTouch = (e) => {
+    // For mobile, just set a fixed highlight position
+    e.currentTarget.style.setProperty('--mouse-x', '50%');
+    e.currentTarget.style.setProperty('--mouse-y', '50%');
+    setIsBottomHovered(true);
   };
 
   if (!safeStudent) {
@@ -501,19 +545,20 @@ const StudentCard = ({ student, delay = 0, playSound }) => {
     >
       <CardContainer
         ref={cardRef}
-        variants={cardVariants}
-        initial="hidden"
-        animate="visible"
-        onHoverStart={() => {
-          setIsHovered(true);
-          if (playSound) playSound('hover');
-        }}
-        onHoverEnd={() => {
-          setIsHovered(false);
-          setIsBottomHovered(false);
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        transition={{ 
+          type: "spring",
+          stiffness: 260,
+          damping: 20,
+          delay: delay * 0.1
         }}
         onMouseMove={handleMouseMove}
+        onTouchStart={handleTouch}
+        onTouchEnd={() => setIsBottomHovered(false)}
         isBottomHovered={isBottomHovered}
+        whileTap={{ scale: 0.98 }}
       >
         <div className="bottom-shadow" />
         <ImageContainer>
