@@ -392,27 +392,30 @@ const DefaultAvatar = styled(motion.div)`
 `;
 
 const StudentCard = ({ student, delay = 0, playSound }) => {
+  // Safety check - if student is not an object, create a fallback
+  const safeStudent = typeof student === 'object' && student !== null ? student : {};
+  
   const [isHovered, setIsHovered] = useState(false);
   const [imageError, setImageError] = useState(false);
-  const [imagePath, setImagePath] = useState(student?.image || '');
+  const [imagePath, setImagePath] = useState(safeStudent.image || '');
   const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
   const [isBottomHovered, setIsBottomHovered] = useState(false);
   const cardRef = useRef(null);
 
   useEffect(() => {
-    if (student?.image) {
+    if (safeStudent.image) {
       const img = new Image();
-      img.src = student.image;
+      img.src = safeStudent.image;
       img.onload = () => {
-        setImagePath(student.image);
+        setImagePath(safeStudent.image);
         setImageError(false);
       };
       img.onerror = () => {
-        console.error(`Failed to load image: ${student.image}`);
+        console.error(`Failed to load image: ${safeStudent.image}`);
         setImageError(true);
       };
     }
-  }, [student?.image]);
+  }, [safeStudent.image]);
 
   const cardVariants = {
     hidden: { 
@@ -479,18 +482,18 @@ const StudentCard = ({ student, delay = 0, playSound }) => {
     setIsBottomHovered(isInBottomArea);
   };
 
-  if (!student) {
+  if (!safeStudent) {
     return null;
   }
 
   return (
     <Link 
-      to={`/student/${encodeURIComponent(student.id)}`} 
+      to={safeStudent.id ? `/student/${encodeURIComponent(safeStudent.id)}` : '#'} 
       style={{ textDecoration: 'none' }}
       onClick={(e) => {
-        if (!student || !student.id) {
+        if (!safeStudent.id) {
           e.preventDefault();
-          console.error("Cannot navigate - student or student ID is missing");
+          console.error("Cannot navigate - student ID is missing");
           return;
         }
         if (playSound) playSound('click');
@@ -524,21 +527,21 @@ const StudentCard = ({ student, delay = 0, playSound }) => {
               <FaUser />
             </DefaultAvatar>
           )}
-          {student.role && (
+          {safeStudent.role && (
             <PremiumBadge
               variants={premiumVariants}
               initial="hidden"
               animate="visible"
             >
-              {getPremiumIcon(student.role)}
+              {getPremiumIcon(safeStudent.role)}
             </PremiumBadge>
           )}
         </ImageContainer>
         
         <ContentContainer>
           <UserInfo>
-            <UserName>{student.name || `Student ${student.id}`}</UserName>
-            <UserId>ID: {student.id}</UserId>
+            <UserName>{safeStudent.name || `Student ${safeStudent.id || 'Unknown'}`}</UserName>
+            <UserId>ID: {safeStudent.id || 'N/A'}</UserId>
           </UserInfo>
         </ContentContainer>
       </CardContainer>

@@ -333,9 +333,10 @@ const StatNumber = styled.div`
   margin-bottom: 0.5rem;
 `;
 
-const StatTitle = styled.div`
+const StatTitle = styled.h4`
   font-size: 1rem;
   color: ${props => props.theme.colors.textSecondary || '#E5E5E5'};
+  margin-top: 0.6rem;
   font-weight: 500;
 `;
 
@@ -425,6 +426,84 @@ const FloatingGradient = styled(motion.div)`
   pointer-events: none;
 `;
 
+// Developer section styles
+const DeveloperSection = styled.div`
+  padding: 5rem 0;
+  max-width: 1200px;
+  margin: 0 auto;
+`;
+
+const DeveloperTitle = styled.h2`
+  font-size: 2rem;
+  color: ${props => props.theme.colors.textPrimary || '#FFFFFF'};
+  text-align: center;
+  margin-bottom: 3rem;
+  font-weight: 600;
+  position: relative;
+  
+  &:after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 2px;
+    background-color: #E50914;
+    margin: 0.8rem auto 0;
+  }
+`;
+
+const DeveloperGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2.5rem;
+  padding: 0 2rem;
+`;
+
+const DeveloperCard = styled(motion.div)`
+  text-align: center;
+  padding: 2.5rem 2rem;
+  background: ${props => props.theme.effects?.glass?.background || 'rgba(25, 25, 25, 0.7)'};
+  backdrop-filter: ${props => props.theme.effects?.glass?.backdropFilter || 'blur(15px)'};
+  border-radius: 10px;
+  border: ${props => props.theme.effects?.glass?.border || '1px solid rgba(70, 70, 70, 0.3)'};
+  transition: all 0.4s ease;
+  
+  &:hover {
+    transform: translateY(-10px);
+    background: rgba(30, 30, 30, 0.8);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(229, 9, 20, 0.1);
+  }
+`;
+
+const DeveloperAvatar = styled.img`
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #E50914;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 5px 15px rgba(229, 9, 20, 0.3);
+`;
+
+const DeveloperName = styled.h3`
+  font-size: 1.4rem;
+  color: ${props => props.theme.colors.textPrimary || '#FFFFFF'};
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+`;
+
+const DeveloperRole = styled.p`
+  color: #E50914;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+`;
+
+const DeveloperBio = styled.p`
+  color: ${props => props.theme.colors.textSecondary || '#E5E5E5'};
+  font-size: 0.9rem;
+  line-height: 1.6;
+`;
+
 const About = ({ soundContext }) => {
   // Add fallback for soundContext
   const playSound = useMemo(() => {
@@ -436,6 +515,7 @@ const About = ({ soundContext }) => {
   const featuresControls = useAnimation();
   const statsControls = useAnimation();
   const ctaControls = useAnimation();
+  const developerControls = useAnimation();
   
   const [aboutRef, aboutInView] = useInView({
     threshold: 0.2,
@@ -457,13 +537,19 @@ const About = ({ soundContext }) => {
     triggerOnce: true
   });
   
+  const [developerRef, developerInView] = useInView({
+    threshold: 0.2,
+    triggerOnce: true
+  });
+  
   // Use effect to trigger animations when sections come into view
   React.useEffect(() => {
     if (aboutInView) aboutControls.start('visible');
     if (featuresInView) featuresControls.start('visible');
     if (statsInView) statsControls.start('visible');
     if (ctaInView) ctaControls.start('visible');
-  }, [aboutInView, featuresInView, statsInView, ctaInView, aboutControls, featuresControls, statsControls, ctaControls]);
+    if (developerInView) developerControls.start('visible');
+  }, [aboutInView, featuresInView, statsInView, ctaInView, developerInView, aboutControls, featuresControls, statsControls, ctaControls, developerControls]);
   
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -565,6 +651,291 @@ const About = ({ soundContext }) => {
         </motion.div>
       </PageHeader>
       
+      {/* Developers Section - Premium Digital Style */}
+      <Section style={{ padding: 0, margin: 0 }}>
+        <div 
+          ref={developerRef}
+          style={{ 
+            background: 'linear-gradient(135deg, rgba(15, 15, 15, 0.95), rgba(5, 5, 5, 0.98))',
+            padding: '0',
+            margin: '0 0 5rem',
+            borderBottom: '2px solid rgba(229, 9, 20, 0.5)',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.8)',
+            overflow: 'hidden',
+            position: 'relative'
+          }}
+        >
+          {/* Digital circuit lines */}
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            background: 'url("data:image/svg+xml,%3Csvg width=\'100%25\' height=\'100%25\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cdefs%3E%3Cpattern id=\'smallGrid\' width=\'30\' height=\'30\' patternUnits=\'userSpaceOnUse\'%3E%3Cpath d=\'M 30 0 L 0 0 0 30\' fill=\'none\' stroke=\'rgba(229, 9, 20, 0.05)\' stroke-width=\'0.5\'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width=\'100%25\' height=\'100%25\' fill=\'url(%23smallGrid)\'/%3E%3C/svg%3E")',
+            opacity: 0.3,
+            zIndex: 0
+          }}></div>
+          
+          {/* Digital radial gradients */}
+          <div style={{
+            position: 'absolute',
+            top: '-30%',
+            right: '-10%',
+            width: '700px',
+            height: '700px',
+            background: 'radial-gradient(circle, rgba(229, 9, 20, 0.08) 0%, rgba(229, 9, 20, 0) 60%)',
+            filter: 'blur(60px)',
+            opacity: 0.6,
+            zIndex: 0
+          }}></div>
+          
+          <div style={{
+            position: 'absolute',
+            bottom: '-30%',
+            left: '-10%',
+            width: '600px',
+            height: '600px',
+            background: 'radial-gradient(circle, rgba(229, 9, 20, 0.1) 0%, rgba(229, 9, 20, 0) 60%)',
+            filter: 'blur(60px)',
+            opacity: 0.7,
+            zIndex: 0
+          }}></div>
+          
+          <motion.div
+            initial="hidden"
+            animate={developerControls}
+            variants={containerVariants}
+            style={{ 
+              maxWidth: '1200px', 
+              margin: '0 auto', 
+              padding: '7rem 2rem',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              position: 'relative',
+              zIndex: 1
+            }}
+          >
+            {/* Tech-inspired section title */}
+            <motion.div 
+              variants={itemVariants}
+              style={{ marginBottom: '3rem', textAlign: 'center', position: 'relative' }}
+            >
+              <h2 style={{
+                 fontSize: '2.4rem',
+                 color: '#FFFFFF',
+                 fontWeight: '700',
+                 letterSpacing: '1px',
+                 textTransform: 'uppercase',
+                 margin: '0 0 1rem',
+                 textShadow: '0 0 10px rgba(229, 9, 20, 0.3)'
+               }}>
+                  <span style={{ 
+                    position: 'relative', 
+                    zIndex: 2,
+                    background: 'linear-gradient(90deg, #fff, #f5f5f5)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent'
+                  }}>Developer</span>
+                  <span style={{
+                    position: 'absolute',
+                    left: '-2px',
+                    top: '2px',
+                    zIndex: 1,
+                    color: 'rgba(229, 9, 20, 0.7)',
+                    WebkitTextFillColor: 'rgba(229, 9, 20, 0.7)'
+                  }}>Developer</span>
+                </h2>
+               
+               <div style={{
+                 width: '160px',
+                 height: '2px',
+                 background: 'linear-gradient(to right, transparent, #E50914, transparent)',
+                 margin: '0 auto',
+                 position: 'relative'
+               }}>
+               </div>
+            </motion.div>
+            
+            {/* Premium digital card */}
+            <motion.div 
+              variants={itemVariants}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                maxWidth: '850px',
+                background: 'rgba(22, 22, 25, 0.8)',
+                backdropFilter: 'blur(20px)',
+                borderRadius: '24px',
+                padding: '4rem 3rem',
+                boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5), 0 0 20px rgba(229, 9, 20, 0.15)',
+                border: '1px solid rgba(120, 120, 120, 0.15)',
+                position: 'relative',
+                overflow: 'hidden'
+              }}
+            >
+              {/* Digital corner accents */}
+              <div style={{
+                position: 'absolute',
+                top: '0',
+                left: '0',
+                width: '60px',
+                height: '60px',
+                borderTop: '2px solid rgba(229, 9, 20, 0.7)',
+                borderLeft: '2px solid rgba(229, 9, 20, 0.7)',
+                borderTopLeftRadius: '12px',
+              }}></div>
+              
+              <div style={{
+                position: 'absolute',
+                top: '0',
+                right: '0',
+                width: '60px',
+                height: '60px',
+                borderTop: '2px solid rgba(229, 9, 20, 0.7)',
+                borderRight: '2px solid rgba(229, 9, 20, 0.7)',
+                borderTopRightRadius: '12px',
+              }}></div>
+              
+              <div style={{
+                position: 'absolute',
+                bottom: '0',
+                left: '0',
+                width: '60px',
+                height: '60px',
+                borderBottom: '2px solid rgba(229, 9, 20, 0.7)',
+                borderLeft: '2px solid rgba(229, 9, 20, 0.7)',
+                borderBottomLeftRadius: '12px',
+              }}></div>
+              
+              <div style={{
+                position: 'absolute',
+                bottom: '0',
+                right: '0',
+                width: '60px',
+                height: '60px',
+                borderBottom: '2px solid rgba(229, 9, 20, 0.7)',
+                borderRight: '2px solid rgba(229, 9, 20, 0.7)',
+                borderBottomRightRadius: '12px',
+              }}></div>
+              
+              {/* Futuristic avatar frame */}
+              <div style={{
+                position: 'relative',
+                marginBottom: '3rem',
+              }}>
+                <div style={{
+                  position: 'absolute',
+                  top: '-8px',
+                  left: '-8px',
+                  right: '-8px',
+                  bottom: '-8px',
+                  borderRadius: '50%',
+                  background: 'conic-gradient(from 180deg at 50% 50%, rgba(229, 9, 20, 0.8) 0deg, rgba(229, 9, 20, 0.1) 90deg, rgba(229, 9, 20, 0) 180deg, rgba(229, 9, 20, 0.1) 270deg, rgba(229, 9, 20, 0.8) 360deg)',
+                  zIndex: 1,
+                  animation: 'rotate 8s linear infinite',
+                }}></div>
+                
+                <div style={{
+                  position: 'relative',
+                  zIndex: 2,
+                  padding: '6px',
+                  background: 'linear-gradient(135deg, rgba(40, 40, 45, 0.9), rgba(20, 20, 25, 0.9))',
+                  borderRadius: '50%',
+                }}>
+                  <img 
+                    src="/assets/images/avatar/avatar-30.jpg" 
+                    alt="Shafin Khan"
+                    style={{
+                      width: '200px',
+                      height: '200px',
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      border: '3px solid rgba(30, 30, 35, 0.9)',
+                      boxShadow: '0 0 20px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(229, 9, 20, 0.3)',
+                    }}
+                  />
+                </div>
+              </div>
+              
+              {/* Modern typography */}
+              <h3 style={{
+                fontSize: '2.4rem',
+                background: 'linear-gradient(90deg, #fff, #d0d0d0)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                fontWeight: '700',
+                letterSpacing: '1px',
+                margin: '0 0 0.8rem',
+                textAlign: 'center',
+                textShadow: '0 0 10px rgba(255, 255, 255, 0.1)'
+              }}>
+                Shafin Khan
+              </h3>
+              
+              <div style={{
+                color: '#E50914',
+                fontSize: '1.2rem',
+                fontWeight: '500',
+                margin: '0 0 2rem',
+                textAlign: 'center',
+                textTransform: 'uppercase',
+                letterSpacing: '3px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px'
+              }}>
+                <span style={{
+                  display: 'inline-block',
+                  width: '35px',
+                  height: '1px',
+                  background: 'linear-gradient(to right, transparent, rgba(229, 9, 20, 0.8))'
+                }}></span>
+                LEAD DEVELOPER
+                <span style={{
+                  display: 'inline-block',
+                  width: '35px',
+                  height: '1px',
+                  background: 'linear-gradient(to left, transparent, rgba(229, 9, 20, 0.8))'
+                }}></span>
+              </div>
+              
+              {/* Digital-style text container */}
+              <div style={{
+                background: 'rgba(15, 15, 18, 0.7)',
+                backdropFilter: 'blur(10px)',
+                borderRadius: '12px',
+                padding: '2rem 2.5rem',
+                maxWidth: '700px',
+                border: '1px solid rgba(90, 90, 95, 0.1)',
+                boxShadow: 'inset 0 0 20px rgba(0, 0, 0, 0.2)',
+              }}>
+                <p style={{
+                  color: 'rgba(220, 220, 225, 0.9)',
+                  lineHeight: '1.8',
+                  fontSize: '1.15rem',
+                  textAlign: 'center',
+                  margin: '0',
+                  fontWeight: '300',
+                  letterSpacing: '0.3px'
+                }}>
+                  Hi, I'm Shafin Khan — a passionate graphics designer and the creator of EEEFlix. Driven by curiosity and a desire to support junior students, I developed this platform to help EEE students easily connect with their rollmates and seniors, fostering a collaborative and inclusive academic community. I believe in using design as a tool to solve real-world problems, and I'm committed to making the academic journey smoother for those who come after me.
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+          
+          <style jsx global>{`
+            @keyframes rotate {
+              from { transform: rotate(0deg); }
+              to { transform: rotate(360deg); }
+            }
+          `}</style>
+        </div>
+      </Section>
+      
       {/* Story Section */}
       <Section>
         <AboutContent>
@@ -577,16 +948,20 @@ const About = ({ soundContext }) => {
             <motion.div variants={itemVariants}>
               <AboutTitle>The Story Behind EEEFlix</AboutTitle>
               <AboutParagraph>
-                EEEFlix was created to bridge the gap between juniors and seniors. It's a platform where you can find your rollmate, seek academic help, and build lasting connections.
+                It all started with a simple question: "Who are the people around me?"
+                As a junior in the EEE department, I often found myself wondering who my rollmates were, how to reach out to seniors for help, or how to simply connect with someone in my class. The answers weren't always easy to find.
               </AboutParagraph>
               <AboutParagraph>
-                Built with the goal of fostering stronger academic bonds and peer networks, EEEFlix allows you to easily search, explore, and connect with your fellow rollmates using name or roll number – no login required.
+                That curiosity sparked an idea — what if there was a platform where students could find each other effortlessly, without logins, without confusion? A place where names and roll numbers meant more than just a list — where they became the start of real conversations, shared struggles, and collaborative learning.
               </AboutParagraph>
               <AboutParagraph>
-                Whether you're looking for a senior for academic advice, a classmate to form a study group, or simply reconnecting with friends, EEEFlix is your digital companion to build meaningful student relationships.
+                And so, EEEFlix was born.
               </AboutParagraph>
               <AboutParagraph>
-                Discover your rollmates. Strengthen your network. Grow together with EEEFlix.
+                Created with the intention to support, connect, and uplift the EEE student community, EEEFlix makes it easy to discover your rollmates, seek academic guidance, and build bonds that go beyond the classroom. Whether you're looking for a study partner, a senior's advice, or just a familiar name to say hello to — this platform is for you.
+              </AboutParagraph>
+              <AboutParagraph>
+                Because in the end, learning becomes richer when we grow together.
               </AboutParagraph>
             </motion.div>
           </AboutText>

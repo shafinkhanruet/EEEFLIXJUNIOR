@@ -1,35 +1,39 @@
 :root {
-  /* Core colors */
-  --primary-color: #0D1321;
-  --secondary-color: #102A4C;
-  --accent-color: #1E57B1;
-  --accent-hover: #3772CF;
+  /* Core colors - Netflix inspired digital theme */
+  --primary-color: #141414;
+  --secondary-color: #0F0F0F;
+  --accent-color: #E50914; 
+  --accent-hover: #F40612;
   --text-primary: #ffffff;
-  --text-secondary: #e8e9f3;
-  --text-tertiary: #a8b1cf;
-  --background-dark: #040911;
-  --background-light: #0C162A;
-  --card-background: #0F1C30;
-  --card-hover: #162840;
+  --text-secondary: #B3B3B3;
+  --text-tertiary: #999999;
+  --background-dark: #000000;
+  --background-light: #141414;
+  --card-background: #181818;
+  --card-hover: #232323;
   --success-color: #2DD385;
   --warning-color: #F2A93B;
-  --error-color: #E74C3C;
-  --info-color: #3498DB;
+  --error-color: #E50914;
+  --info-color: #B3B3B3;
   
-  /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #0D1321 0%, #102A4C 100%);
-  --gradient-accent: linear-gradient(135deg, #1E57B1 0%, #0D2B5B 100%);
-  --gradient-card: linear-gradient(180deg, rgba(15, 28, 48, 0.8) 0%, rgba(10, 15, 31, 0.9) 100%);
-  --gradient-overlay: linear-gradient(180deg, rgba(4, 9, 17, 0) 0%, rgba(4, 9, 17, 0.8) 100%);
-  --gradient-hero: linear-gradient(135deg, rgba(16, 42, 76, 0.8) 0%, rgba(15, 28, 48, 0.8) 100%);
+  /* Gradients - Netflix digital theme */
+  --gradient-primary: linear-gradient(135deg, #000000 0%, #141414 100%);
+  --gradient-accent: linear-gradient(135deg, #E50914 0%, #B20710 100%);
+  --gradient-card: linear-gradient(180deg, rgba(24, 24, 24, 0.8) 0%, rgba(0, 0, 0, 0.9) 100%);
+  --gradient-overlay: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 100%);
+  --gradient-hero: linear-gradient(135deg, rgba(20, 20, 20, 0.8) 0%, rgba(0, 0, 0, 0.8) 100%);
+  --gradient-digital: linear-gradient(180deg, rgba(229, 9, 20, 0.05) 0%, rgba(0, 0, 0, 0) 50%, rgba(229, 9, 20, 0.05) 100%);
+  --gradient-neon: linear-gradient(90deg, rgba(229, 9, 20, 0) 0%, rgba(229, 9, 20, 0.15) 50%, rgba(229, 9, 20, 0) 100%);
   
-  /* Shadows */
-  --shadow-small: 0 2px 8px rgba(0, 0, 0, 0.2);
-  --shadow-medium: 0 4px 15px rgba(0, 0, 0, 0.25);
-  --shadow-large: 0 8px 30px rgba(0, 0, 0, 0.3);
-  --shadow-xl: 0 12px 40px rgba(0, 0, 0, 0.4);
-  --shadow-glow: 0 0 15px rgba(30, 87, 177, 0.5);
-  --shadow-card-hover: 0 15px 30px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.1);
+  /* Shadows - Digital Netflix style */
+  --shadow-small: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --shadow-medium: 0 4px 15px rgba(0, 0, 0, 0.35);
+  --shadow-large: 0 8px 30px rgba(0, 0, 0, 0.45);
+  --shadow-xl: 0 12px 40px rgba(0, 0, 0, 0.55);
+  --shadow-glow: 0 0 20px rgba(229, 9, 20, 0.6);
+  --shadow-card-hover: 0 15px 35px rgba(0, 0, 0, 0.3), 0 5px 15px rgba(0, 0, 0, 0.2);
+  --shadow-digital: 0 0 15px rgba(229, 9, 20, 0.5), 0 0 30px rgba(229, 9, 20, 0.3);
+  --shadow-digital-edge: 0 0 0 1px rgba(229, 9, 20, 0.3), 0 0 15px rgba(229, 9, 20, 0.2);
   
   /* Transitions */
   --transition-fast: 0.2s ease;
@@ -68,12 +72,32 @@ body {
   color: var(--text-primary);
   overflow-x: hidden;
   background-image: 
-    radial-gradient(circle at 25% 25%, rgba(30, 87, 177, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 75% 75%, rgba(16, 42, 76, 0.03) 0%, transparent 50%);
+    radial-gradient(circle at 25% 25%, rgba(229, 9, 20, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(0, 0, 0, 0.05) 0%, transparent 50%);
   background-attachment: fixed;
   line-height: 1.6;
   font-size: 16px;
   letter-spacing: 0.3px;
+  position: relative;
+}
+
+/* Add digital scanline effect */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    rgba(0, 0, 0, 0.02) 50%
+  );
+  background-size: 100% 4px;
+  z-index: 200;
+  opacity: 0.3;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -145,8 +169,7 @@ a {
   transition: all var(--transition-medium) ease;
 }
 
-/* Link hover effect is now handled in the a selector */
-
+/* Digital button styling */
 button {
   cursor: pointer;
   font-family: 'Poppins', sans-serif;
@@ -160,11 +183,12 @@ button {
   position: relative;
   overflow: hidden;
   letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(229, 9, 20, 0.3);
   
   &:hover {
     background: var(--accent-hover);
     transform: translateY(-2px);
-    box-shadow: var(--shadow-medium);
+    box-shadow: 0 6px 16px rgba(229, 9, 20, 0.4);
   }
   
   &:active {
@@ -173,6 +197,7 @@ button {
   
   &.btn-premium {
     background: var(--gradient-accent);
+    position: relative;
     
     &::before {
       content: '';
@@ -181,12 +206,28 @@ button {
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
       transition: var(--transition-medium);
     }
     
     &:hover::before {
       left: 100%;
+    }
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+      opacity: 0;
+      transition: var(--transition-medium);
+    }
+    
+    &:hover::after {
+      opacity: 1;
     }
   }
 }
@@ -197,31 +238,27 @@ img {
   display: block;
 }
 
-.container {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
-}
-
-/* Custom scrollbar */
+/* Digital scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
+  background-color: #0a0a0a;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--background-dark);
+  background-color: #0a0a0a;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(30, 87, 177, 0.5);
+  background-color: #2e2e2e;
   border-radius: 3px;
+  border: 1px solid rgba(229, 9, 20, 0.3);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-hover);
+  background-color: #E50914;
+  box-shadow: 0 0 8px rgba(229, 9, 20, 0.6);
 }
 
 /* Utility classes */

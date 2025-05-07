@@ -12,6 +12,13 @@ export const resources = [
     description: 'Comprehensive physics resources including Atomic Structure, Diffraction, Electronic Structure of Matter, Interference, Magnetism, and more.',
     fileType: 'Multiple PDF files',
     driveUrl: 'https://drive.google.com/drive/folders/your-folder-id-2'
+  },
+  {
+    id: '3',
+    title: 'English by MD Sajeeb Hussain-2301032',
+    description: 'A curated collection of English resources including idioms, phonetics, reading techniques, writing, and more for comprehensive language learning.',
+    fileType: 'Multiple files',
+    driveUrl: 'https://drive.google.com/drive/folders/1uURICUsjnT50ecPwDRri0XC1wwtQ3Azo?usp=drive_link'
   }
 ];
 

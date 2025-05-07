@@ -267,7 +267,19 @@ const createStudentData = () => {
 export const allStudents = createStudentData();
 
 // Select only 2023 batch students (IDs starting with 2301) for the featured section
-export const featuredStudents = allStudents
-  .filter(student => student.id.startsWith('2301')) // Only 23 series students
-  .sort(() => Math.random() - 0.5) // Randomly shuffle all 2301 students
-  .slice(0, 10); // Select 10 students to ensure we have enough
+export const featuredStudents = (() => {
+  try {
+    if (!Array.isArray(allStudents)) {
+      console.error('allStudents is not an array');
+      return [];
+    }
+    
+    return allStudents
+      .filter(student => student.id.startsWith('2301')) // Only 23 series students
+      .sort(() => Math.random() - 0.5) // Randomly shuffle all 2301 students
+      .slice(0, 10); // Select 10 students to ensure we have enough
+  } catch (error) {
+    console.error('Error creating featuredStudents:', error);
+    return [];
+  }
+})();

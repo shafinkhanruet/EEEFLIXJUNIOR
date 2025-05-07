@@ -52,6 +52,7 @@ const ButtonStyles = `
   }
 `;
 
+// Digital edge glow effect
 const ButtonGlow = styled(motion.div)`
   position: absolute;
   top: 0;
@@ -66,45 +67,94 @@ const ButtonGlow = styled(motion.div)`
   background: radial-gradient(circle at center, rgba(229, 9, 20, 0.15) 0%, rgba(229, 9, 20, 0) 70%);
 `;
 
+// Digital grid overlay
+const ButtonGrid = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='rgba(255, 255, 255, 0.05)' stroke-width='0.5'%3E%3Cpath d='M0 10h20M10 0v20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+  pointer-events: none;
+`;
+
+// Digital scan line
+const ButtonScanline = styled(motion.div)`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(229, 9, 20, 0.5), transparent);
+  opacity: 0;
+  z-index: 1;
+  pointer-events: none;
+`;
+
 const StyledButton = styled(motion.button)`
   ${ButtonStyles}
   background: ${props => 
     props.variant === 'outline' 
       ? 'transparent' 
       : props.variant === 'secondary' 
-        ? 'rgba(109, 109, 110, 0.7)' 
+        ? 'rgba(40, 40, 40, 0.7)' 
         : props.variant === 'premium'
-          ? props.theme.colors.gradientPrimary
+          ? props.theme.colors.gradientAccent
           : '#E50914'};
   color: ${props => props.variant === 'outline' ? '#B3B3B3' : '#FFFFFF'};
   border: ${props => 
     props.variant === 'outline' 
-      ? `1px solid #B3B3B3` 
+      ? `1px solid rgba(229, 9, 20, 0.3)` 
       : props.variant === 'gold'
         ? `1px solid #E50914`
         : 'none'};
+        
+  // Digital border for all buttons
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+    box-shadow: 0 0 0 1px rgba(229, 9, 20, 0.1);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
   
   &:hover {
     background: ${props => 
       props.variant === 'outline' 
-        ? 'rgba(255, 255, 255, 0.08)' 
+        ? 'rgba(229, 9, 20, 0.05)' 
         : props.variant === 'secondary' 
-          ? 'rgba(109, 109, 110, 0.5)' 
+          ? 'rgba(40, 40, 40, 0.9)' 
           : props.variant === 'premium'
-            ? props.theme.colors.gradientRoyal
+            ? props.theme.colors.gradientButtonHover
             : props.variant === 'gold'
               ? 'rgba(229, 9, 20, 0.9)'
               : '#F40612'};
     transform: translateY(-2px);
     box-shadow: ${props => 
       props.variant === 'premium' 
-        ? props.theme.shadows.premium 
+        ? '0 8px 25px rgba(229, 9, 20, 0.4), 0 0 0 1px rgba(229, 9, 20, 0.4)' 
         : props.variant === 'gold'
-          ? props.theme.shadows.goldGlow
-          : props.theme.shadows.medium};
+          ? props.theme.shadows.digitalGlow
+          : '0 8px 20px rgba(229, 9, 20, 0.3)'};
     
     ${ButtonGlow} {
       opacity: ${props => (props.variant === 'premium' || props.variant === 'gold') ? 0.8 : 0.4};
+    }
+    
+    ${ButtonGrid} {
+      opacity: 0.8;
+    }
+    
+    &::after {
+      opacity: 1;
     }
   }
   
@@ -113,7 +163,7 @@ const StyledButton = styled(motion.button)`
   }
   
   &:disabled {
-    background: #555;
+    background: #333;
     cursor: not-allowed;
     opacity: 0.7;
     box-shadow: none;
@@ -121,9 +171,13 @@ const StyledButton = styled(motion.button)`
     &:hover {
       transform: none;
       box-shadow: none;
+      
+      ${ButtonGrid} {
+        opacity: 0;
+      }
     }
     
-    &:before {
+    &:before, &::after {
       display: none;
     }
   }
@@ -135,30 +189,55 @@ const StyledLinkButton = styled(motion(Link))`
     props.variant === 'outline' 
       ? 'transparent' 
       : props.variant === 'secondary' 
-        ? 'rgba(109, 109, 110, 0.7)' 
+        ? 'rgba(40, 40, 40, 0.7)' 
         : props.variant === 'premium'
-          ? '#E50914'
+          ? props.theme.colors.gradientAccent
           : '#E50914'};
   color: #FFFFFF;
   border: ${props => 
     props.variant === 'outline' 
-      ? `1px solid #B3B3B3` 
+      ? `1px solid rgba(229, 9, 20, 0.3)` 
       : 'none'};
+  
+  // Digital border for all buttons
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+    box-shadow: 0 0 0 1px rgba(229, 9, 20, 0.1);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
   
   &:hover {
     background: ${props => 
       props.variant === 'outline' 
-        ? 'rgba(255, 255, 255, 0.08)' 
+        ? 'rgba(229, 9, 20, 0.05)' 
         : props.variant === 'secondary' 
-          ? 'rgba(109, 109, 110, 0.5)' 
+          ? 'rgba(40, 40, 40, 0.9)' 
           : props.variant === 'premium'
-            ? '#F40612'
+            ? props.theme.colors.gradientButtonHover
             : '#F40612'};
     transform: translateY(-2px);
-    box-shadow: ${props => props.variant === 'premium' ? props.theme.shadows.premium : props.theme.shadows.medium};
+    box-shadow: ${props => 
+      props.variant === 'premium' 
+        ? '0 8px 25px rgba(229, 9, 20, 0.4), 0 0 0 1px rgba(229, 9, 20, 0.4)' 
+        : '0 8px 20px rgba(229, 9, 20, 0.3)'};
     
     ${ButtonGlow} {
       opacity: ${props => props.variant === 'premium' ? 0.8 : 0.4};
+    }
+    
+    ${ButtonGrid} {
+      opacity: 0.8;
+    }
+    
+    &::after {
+      opacity: 1;
     }
   }
   
@@ -188,11 +267,34 @@ const Button = ({
   ...props 
 }) => {
   const [ripples, setRipples] = useState([]);
+  const [isHovered, setIsHovered] = useState(false);
   
   const buttonVariants = {
     initial: { scale: 1 },
     hover: { scale: 1.02 },
     tap: { scale: 0.98 }
+  };
+
+  const scanlineVariants = {
+    initial: { top: '-2px', opacity: 0 },
+    hover: { 
+      top: '100%',
+      opacity: 0.8,
+      transition: { 
+        top: {
+          duration: 1.5,
+          repeat: Infinity,
+          repeatType: 'loop'
+        },
+        opacity: {
+          duration: 0.3
+        }
+      }
+    },
+    exit: {
+      opacity: 0,
+      transition: { duration: 0.3 }
+    }
   };
   
   const handleRipple = (e) => {
@@ -222,62 +324,90 @@ const Button = ({
     if (onClick) onClick(e);
   };
   
+  const handleMouseEnter = (e) => {
+    setIsHovered(true);
+    if (onMouseEnter) onMouseEnter(e);
+  };
+  
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+  };
+  
   const renderContent = () => (
     <>
       <span>
-        {iconPosition === 'left' && icon}
+        {icon && iconPosition === 'left' && icon}
         {children}
-        {iconPosition === 'right' && icon}
+        {icon && iconPosition === 'right' && icon}
       </span>
       <ButtonGlow />
+      <ButtonGrid />
       <AnimatePresence>
-        {ripples.map(ripple => (
+        {isHovered && (
+          <ButtonScanline
+            variants={scanlineVariants}
+            initial="initial"
+            animate="hover"
+            exit="exit"
+          />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {ripples.map((ripple) => (
           <Ripple
             key={ripple.id}
-            style={{ 
-              left: ripple.x, 
-              top: ripple.y, 
-              width: ripple.size, 
-              height: ripple.size 
+            style={{
+              left: ripple.x,
+              top: ripple.y,
+              width: ripple.size,
+              height: ripple.size,
             }}
-            initial={{ transform: 'scale(0)', opacity: 0.8 }}
-            animate={{ transform: 'scale(1)', opacity: 0 }}
+            initial={{ scale: 0, opacity: 0.7 }}
+            animate={{ scale: 4, opacity: 0 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8 }}
+            onAnimationComplete={() => {
+              setRipples((prev) => prev.filter((r) => r.id !== ripple.id));
+            }}
           />
         ))}
       </AnimatePresence>
     </>
   );
-
+  
   if (to) {
     return (
       <StyledLinkButton
         to={to}
         variant={variant}
         onClick={handleClick}
-        onMouseEnter={onMouseEnter}
+        disabled={disabled}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        variants={buttonVariants}
         initial="initial"
         whileHover="hover"
-        whileTap="tap"
-        variants={buttonVariants}
+        whileTap={!disabled ? "tap" : undefined}
+        transition={{ type: 'spring', stiffness: 400, damping: 15 }}
         {...props}
       >
         {renderContent()}
       </StyledLinkButton>
     );
   }
-
+  
   return (
     <StyledButton
       variant={variant}
       onClick={handleClick}
       disabled={disabled}
-      onMouseEnter={onMouseEnter}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      variants={buttonVariants}
       initial="initial"
       whileHover="hover"
-      whileTap="tap"
-      variants={buttonVariants}
+      whileTap={!disabled ? "tap" : undefined}
+      transition={{ type: 'spring', stiffness: 400, damping: 15 }}
       {...props}
     >
       {renderContent()}

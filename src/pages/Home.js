@@ -1,7 +1,6 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import styled from 'styled-components';
-import { motion, useAnimation, useScroll, useTransform } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
+import { motion, useAnimation, useScroll, useTransform, useInView } from 'framer-motion';
 import { SoundContext } from '../contexts/SoundContext';
 
 // Components
@@ -11,6 +10,7 @@ import StudentCard from '../components/StudentCard';
 import Hero from '../components/Hero';
 import Features from '../components/Features';
 import ParallaxBackground from '../components/ParallaxBackground';
+import PremiumFeatureSection from '../components/PremiumFeatureSection';
 
 // Mock data
 import { featuredStudents } from '../data/students';
@@ -306,6 +306,9 @@ const Home = () => {
   const [isIntroComplete, setIsIntroComplete] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   
+  // Add a state to handle fetching students
+  const [students, setStudents] = useState([]);
+  
   // Scroll progress bar
   const { scrollYProgress } = useScroll();
   const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
@@ -315,12 +318,14 @@ const Home = () => {
   const featuresControls = useAnimation();
   
   // Multiple refs for different sections
-  const [studentsRef, studentsInView] = useInView({
+  const studentsRef = useRef(null);
+  const featuresRef = useRef(null);
+  const studentsInView = useInView(studentsRef, {
     threshold: 0.1,
     triggerOnce: true
   });
   
-  const [featuresRef, featuresInView] = useInView({
+  const featuresInView = useInView(featuresRef, {
     threshold: 0.1,
     triggerOnce: true
   });
@@ -333,6 +338,17 @@ const Home = () => {
   // Set mounted state after component mounts
   useEffect(() => {
     setIsMounted(true);
+  }, []);
+  
+  useEffect(() => {
+    // Ensure featuredStudents is an array and set it to state
+    if (featuredStudents && Array.isArray(featuredStudents)) {
+      setStudents(featuredStudents);
+    } else {
+      // If featuredStudents is not available or not an array, use an empty array
+      console.error('featuredStudents is not an array or is undefined');
+      setStudents([]);
+    }
   }, []);
   
   // Trigger animations when sections come into view
@@ -411,26 +427,8 @@ const Home = () => {
       {/* Hero Section */}
       <Hero />
       
-      {/* Features Section */}
-      <SectionWrapper
-        ref={featuresRef}
-        initial="hidden"
-        animate={featuresControls}
-        variants={containerVariants}
-      >
-        <EnhancedFeaturesWrapper>
-          <motion.div
-            variants={itemVariants}
-            style={{ textAlign: 'center', marginBottom: '3rem' }}
-          >
-            <EnhancedSectionTitle>Why Choose EEEFlix</EnhancedSectionTitle>
-            <EnhancedSectionSubtitle>
-              Discover the benefits of our premium platform for Electrical & Electronic Engineering students and faculty.
-            </EnhancedSectionSubtitle>
-          </motion.div>
-          <Features />
-        </EnhancedFeaturesWrapper>
-      </SectionWrapper>
+      {/* Replace the Features Section with our new PremiumFeatureSection */}
+      <PremiumFeatureSection />
       
       {/* Featured Students Section */}
       <SectionWrapper
@@ -450,16 +448,22 @@ const Home = () => {
           </SectionHeading>
           
           <FeaturedStudentsGrid>
-            {featuredStudents.slice(0, 4).map((student) => (
-              <motion.div 
-                key={student.id} 
-                variants={itemVariants}
-                whileHover={{ y: -10, transition: { duration: 0.3 } }}
-                style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
-              >
-                <StudentCard student={student} />
-              </motion.div>
-            ))}
+            {students && students.length > 0 ? 
+              students.slice(0, 4).map((student, index) => (
+                <motion.div 
+                  key={student?.id || `student-${index}`} 
+                  variants={itemVariants}
+                  whileHover={{ y: -10, transition: { duration: 0.3 } }}
+                  style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
+                >
+                  <StudentCard student={student} />
+                </motion.div>
+              )) : (
+                <p style={{ color: '#ffffff', textAlign: 'center', width: '100%' }}>
+                  Loading student profiles...
+                </p>
+              )
+            }
           </FeaturedStudentsGrid>
           
           <ViewAllButtonWrapper variants={itemVariants}>

@@ -50,6 +50,64 @@ const NetflixParallelogram = styled(motion.div)`
   z-index: 0;
 `;
 
+// Add new digital elements
+const GridOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='rgba(229, 9, 20, 0.05)' stroke-width='0.5'%3E%3Cpath d='M60 0v60H0V0h60z'/%3E%3Cpath d='M30 0v60M0 30h60'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.4;
+  z-index: 0;
+`;
+
+const ScanLine = styled(motion.div)`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(229, 9, 20, 0.5), transparent);
+  box-shadow: 0 0 15px rgba(229, 9, 20, 0.5);
+  opacity: 0.3;
+  z-index: 1;
+`;
+
+const CircuitPatterns = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='none' stroke='rgba(229, 9, 20, 0.06)' stroke-width='1' d='M10,10 L30,10 L30,30 L50,30 L50,50 L70,50 L70,70 L90,70 M90,30 L70,30 L70,50 L50,50 L50,70 L30,70 L30,90 L10,90'/%3E%3C/svg%3E");
+  opacity: 0.5;
+  z-index: 0;
+`;
+
+const DiagonalLines = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='rgba(229, 9, 20, 0.03)' stroke-width='0.5'%3E%3Cpath d='M-10,50 L50,-10 M-30,70 L70,-30 M10,30 L30,10'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.5;
+  z-index: 0;
+`;
+
+const RedGlowPulse = styled(motion.div)`
+  position: absolute;
+  top: 70%;
+  left: 30%;
+  width: 40%;
+  height: 40%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(229, 9, 20, 0.05) 0%, transparent 70%);
+  filter: blur(40px);
+  z-index: 0;
+`;
+
 const ParallaxBackground = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef(null);
@@ -82,16 +140,53 @@ const ParallaxBackground = () => {
   return (
     <BackgroundContainer ref={containerRef}>
       <NoiseOverlay />
+      <GridOverlay />
+      <CircuitPatterns />
+      <DiagonalLines />
       <NetflixParallelogram 
         animate={{ 
-          opacity: [0.3, 0.5, 0.3],
-          y: [0, 10, 0],
+          opacity: 0.5,
+          y: 10
+        }}
+        initial={{
+          opacity: 0.3,
+          y: 0
         }}
         transition={{
-          duration: 20,
-          repeat: Infinity,
-          repeatType: 'reverse',
+          duration: 10,
+          yoyo: Infinity,
           ease: 'easeInOut',
+        }}
+      />
+      <ScanLine
+        initial={{ top: '-2px' }}
+        animate={{ top: '100vh' }}
+        transition={{
+          duration: 6,
+          repeat: Infinity,
+          ease: 'linear',
+        }}
+      />
+      <RedGlowPulse 
+        animate={{
+          opacity: 0.6,
+          scale: 1.2
+        }}
+        initial={{
+          opacity: 0.3,
+          scale: 1
+        }}
+        transition={{
+          opacity: {
+            duration: 4,
+            yoyo: Infinity,
+            ease: 'easeInOut',
+          },
+          scale: {
+            duration: 4,
+            yoyo: Infinity,
+            ease: 'easeInOut',
+          }
         }}
       />
       <GradientOverlay />

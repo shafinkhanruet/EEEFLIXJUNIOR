@@ -13,6 +13,7 @@ import { SoundContext } from './contexts/SoundContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import LoadingSpinner from './components/LoadingSpinner';
+import DigitalOverlay from './components/DigitalOverlay';
 
 // Lazy loaded components
 const SplashScreen = lazy(() => import('./components/SplashScreen'));
@@ -45,6 +46,36 @@ const TransitionStyle = createGlobalStyle`
   }
 `;
 
+// Add digital scanline animations
+const DigitalOverlays = createGlobalStyle`
+  @keyframes scanline {
+    0% {
+      transform: translateY(-100%);
+    }
+    100% {
+      transform: translateY(100vh);
+    }
+  }
+  
+  @keyframes flicker {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
+  }
+  
+  @keyframes glitch {
+    0%, 100% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+  }
+  
+  @keyframes dataFlow {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 100%; }
+  }
+`;
+
 const AppContainer = styled.div`
   min-height: 100vh;
   display: flex;
@@ -57,6 +88,47 @@ const MainContent = styled(motion.main)`
   flex: 1;
   position: relative;
   z-index: 1;
+`;
+
+// Digital scanline effect
+const Scanline = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(229, 9, 20, 0.6), transparent);
+  box-shadow: 0 0 12px rgba(229, 9, 20, 0.4);
+  opacity: 0.15;
+  z-index: 999;
+  pointer-events: none;
+`;
+
+// Digital grid overlay
+const DigitalGrid = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='rgba(229, 9, 20, 0.03)' stroke-width='0.25'%3E%3Cpath d='M0 20h40M20 0v40'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.25;
+  z-index: 998;
+  pointer-events: none;
+`;
+
+// CRT flicker effect
+const CRTFlicker = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.2) 100%);
+  opacity: 0;
+  z-index: 997;
+  pointer-events: none;
+  animation: flicker 8s ease-in-out infinite;
 `;
 
 // Page Transition Wrapper
@@ -72,6 +144,9 @@ const BackgroundContainer = React.memo(() => (
   </Suspense>
 ));
 
+// Always enable premium digital effects
+const ENABLE_PREMIUM_DIGITAL_EFFECTS = true;
+
 function App() {
   const location = useLocation();
   const [showSplash, setShowSplash] = useState(false); 
@@ -80,6 +155,15 @@ function App() {
   
   // Control when to show the navbar and other elements
   const [showUI, setShowUI] = useState(false);
+  
+  // Always show digital overlay - remove the toggle state
+  
+  // Create a simple sound context value with disabled functionality
+  const soundContextValue = {
+    soundEnabled: false,
+    setSoundEnabled: () => {},
+    playSound: () => {}
+  };
   
   useEffect(() => {
     // Immediately start loading the main content
@@ -135,13 +219,6 @@ function App() {
     setShowUI(true);
   };
 
-  // Create a simple sound context value with disabled functionality
-  const soundContextValue = {
-    soundEnabled: false,
-    setSoundEnabled: () => {},
-    playSound: () => {}
-  };
-
   // Animation variants for main content
   const contentVariants = {
     hidden: { opacity: 0 },
@@ -155,75 +232,70 @@ function App() {
     }
   };
 
+  // Animation for the scanline
+  const scanlineVariants = {
+    initial: { top: '-2px' },
+    animate: { top: '100vh' }
+  };
+
   return (
     <ThemeProvider theme={darkTheme}>
-      <TransitionStyle />
       <SoundContext.Provider value={soundContextValue}>
+        <TransitionStyle />
+        <DigitalOverlays />
         <AppContainer>
-          {showSplash && (
-            <Suspense fallback={<LoadingSpinner />}>
-              <ErrorBoundary onError={handleSplashError}>
-                <SplashScreen onComplete={handleSplashComplete} />
-              </ErrorBoundary>
-            </Suspense>
-          )}
+          <BackgroundContainer />
           
-          <Suspense fallback={null}>
-            <BackgroundContainer />
-          </Suspense>
+          {/* Always show the DigitalOverlay component */}
+          {ENABLE_PREMIUM_DIGITAL_EFFECTS && <DigitalOverlay />}
           
-          <AnimatePresence>
-            {showUI && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.3 }}
-              >
-                <Navbar />
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* Original digital effects */}
+          <Scanline
+            initial={{ top: '-2px' }}
+            animate={{ top: '100vh' }}
+            transition={{
+              duration: 6,
+              repeat: Infinity,
+              ease: 'linear',
+            }}
+          />
+          <DigitalGrid />
+          <CRTFlicker />
           
-          <MainContent
-            initial="hidden"
-            animate={contentReady && showUI ? "visible" : "hidden"}
-            exit="exit"
-            variants={contentVariants}
-          >
-            <AnimatePresence mode="wait">
-              {contentReady && (
-                <Suspense fallback={<LoadingSpinner />}>
-                  <PageTransition
-                    key={location.pathname}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <Routes location={location}>
+          {/* Main content */}
+          {showUI && (
+            <>
+              <Navbar />
+              
+              <MainContent>
+                <AnimatePresence mode="wait">
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <Routes location={location} key={location.pathname}>
                       <Route path="/" element={<Home />} />
                       <Route path="/students" element={<Students />} />
-                      <Route path="/student/:id" element={<StudentProfile />} />
                       <Route path="/about" element={<About />} />
                       <Route path="/contact" element={<Contact />} />
                       <Route path="/resources" element={<Resources />} />
-                      <Route path="/admin/contacts" element={<StudentContactManager />} />
+                      <Route path="/students/:id" element={<StudentProfile />} />
+                      <Route path="/student-contact-manager" element={<StudentContactManager />} />
                     </Routes>
-                  </PageTransition>
-                </Suspense>
-              )}
-            </AnimatePresence>
-          </MainContent>
+                  </Suspense>
+                </AnimatePresence>
+              </MainContent>
+              
+              <Footer />
+            </>
+          )}
           
+          {/* Splash screen */}
           <AnimatePresence>
-            {showUI && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.3 }}
-              >
-                <Footer />
-              </motion.div>
+            {showSplash && (
+              <Suspense fallback={null}>
+                <SplashScreen 
+                  onComplete={handleSplashComplete} 
+                  onError={() => handleSplashError()}
+                />
+              </Suspense>
             )}
           </AnimatePresence>
         </AppContainer>
@@ -232,25 +304,25 @@ function App() {
   );
 }
 
-// Simple error boundary for handling splash screen errors
+// Error boundary to catch errors in splash screen
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
     this.state = { hasError: false };
   }
-  
+
   static getDerivedStateFromError(error) {
     return { hasError: true };
   }
-  
+
   componentDidCatch(error, errorInfo) {
-    console.error("ErrorBoundary caught an error:", error, errorInfo);
+    console.error('ErrorBoundary caught an error', error, errorInfo);
     this.props.onError && this.props.onError();
   }
-  
+
   render() {
     if (this.state.hasError) {
-      return null; // Render nothing if there's an error
+      return null; // Render nothing on error, let parent handle the error state
     }
     return this.props.children;
   }

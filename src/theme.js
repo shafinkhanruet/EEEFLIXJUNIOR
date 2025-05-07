@@ -1,6 +1,6 @@
 export const darkTheme = {
   colors: {
-    // Main colors - Netflix theme
+    // Main colors - Netflix theme with digital accent
     primary: '#141414',
     secondary: '#000000',
     accent: '#E50914',
@@ -9,20 +9,20 @@ export const darkTheme = {
     accentSoft: 'rgba(229, 9, 20, 0.2)',
     accentGlow: 'rgba(229, 9, 20, 0.6)',
     
-    // Premium accent colors - Netflix red for all accent elements
+    // Digital accent colors - Netflix red with digital enhancements
     gold: '#E50914',
     goldLight: '#FF5F5F',
     goldGradient: 'linear-gradient(135deg, #E50914 0%, #FF5F5F 100%)',
     goldSoft: 'rgba(229, 9, 20, 0.2)',
     goldGlow: 'rgba(229, 9, 20, 0.6)',
     
-    // Text colors - Netflix style
+    // Text colors - Netflix style with digital enhancements
     textPrimary: '#FFFFFF',
     textSecondary: '#B3B3B3',
     textTertiary: '#999999',
     textHighlight: '#E50914',
     
-    // Background colors - Netflix dark tones
+    // Background colors - Netflix dark tones with digital depth
     backgroundDark: '#000000',
     backgroundLight: '#141414',
     cardBackground: '#181818',
@@ -34,7 +34,7 @@ export const darkTheme = {
     error: '#E50914',
     info: '#B3B3B3',
     
-    // Enhanced gradients for Netflix look
+    // Digital-inspired gradients with Netflix base
     gradientPrimary: 'linear-gradient(135deg, #000000 0%, #141414 100%)',
     gradientAccent: 'linear-gradient(135deg, #E50914 0%, #B20710 100%)',
     gradientGold: 'linear-gradient(135deg, #E50914 0%, #FF5F5F 100%)',
@@ -48,6 +48,15 @@ export const darkTheme = {
     gradientShimmer: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%)',
     gradientDarkBlue: 'linear-gradient(135deg, #000000 0%, #141414 100%)',
     gradientPremium: 'linear-gradient(135deg, #141414 0%, #E50914 50%, #FF5F5F 100%)',
+    
+    // New digital gradients
+    gradientDigital: 'linear-gradient(135deg, #080808 0%, #1C1C1C 100%)',
+    gradientCyber: 'linear-gradient(180deg, rgba(229, 9, 20, 0.05) 0%, rgba(0, 0, 0, 0) 50%, rgba(229, 9, 20, 0.05) 100%)',
+    gradientMatrix: 'linear-gradient(0deg, rgba(20, 20, 20, 0.8) 0%, rgba(0, 0, 0, 0.9) 100%)',
+    gradientNeon: 'linear-gradient(90deg, rgba(229, 9, 20, 0) 0%, rgba(229, 9, 20, 0.15) 50%, rgba(229, 9, 20, 0) 100%)',
+    gradientDigitalAccent: 'linear-gradient(135deg, #E50914 0%, #FF3B30 50%, #E50914 100%)',
+    gradientCircuit: 'linear-gradient(135deg, #0A0A0A 0%, #141414 50%, #0A0A0A 100%)',
+    gradientRedVignette: 'radial-gradient(circle at center, transparent 0%, rgba(229, 9, 20, 0.03) 70%, rgba(229, 9, 20, 0.06) 100%)',
   },
   fonts: {
     heading: "'Montserrat', sans-serif",
@@ -94,7 +103,13 @@ export const darkTheme = {
     buttonGlow: '0 0 20px rgba(229, 9, 20, 0.5)',
     premium: '0 15px 35px -5px rgba(0, 0, 0, 0.4), 0 10px 15px -6px rgba(0, 0, 0, 0.3)',
     glass: '0 10px 40px 0 rgba(0, 0, 0, 0.4)',
-    highlight: '0 0 0 2px rgba(229, 9, 20, 0.3)'
+    highlight: '0 0 0 2px rgba(229, 9, 20, 0.3)',
+    
+    // Digital shadows
+    digitalGlow: '0 0 15px rgba(229, 9, 20, 0.5), 0 0 30px rgba(229, 9, 20, 0.3)',
+    digitalEdge: '0 0 0 1px rgba(229, 9, 20, 0.3), 0 0 15px rgba(229, 9, 20, 0.2)',
+    neonOutline: '0 0 2px #fff, 0 0 5px #fff, 0 0 10px rgba(229, 9, 20, 0.8)',
+    pixelated: '2px 2px 0px rgba(229, 9, 20, 0.5)',
   },
   transitions: {
     fast: '0.2s ease',
@@ -121,7 +136,13 @@ export const darkTheme = {
     float: 'float 6s ease-in-out infinite',
     rotate: 'rotate 20s linear infinite',
     scale: 'scale 3s ease-in-out infinite',
-    glow: 'glow 2s ease-in-out infinite alternate'
+    glow: 'glow 2s ease-in-out infinite alternate',
+    
+    // Digital animations
+    scanline: 'scanline 2s linear infinite',
+    glitch: 'glitch 5s infinite',
+    flicker: 'flicker 4s linear infinite',
+    dataFlow: 'dataFlow 15s linear infinite',
   },
   zIndex: {
     base: 1,
@@ -134,16 +155,16 @@ export const darkTheme = {
     tooltip: 1600
   },
   
-  // Netflix UI effects
+  // Enhanced UI effects
   effects: {
-    // Glass morphism
+    // Glass morphism with digital enhancements
     glass: {
       background: 'rgba(20, 20, 20, 0.6)',
       backdropFilter: 'blur(10px)',
-      border: '1px solid rgba(255, 255, 255, 0.08)',
+      border: '1px solid rgba(229, 9, 20, 0.1)',
       boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)'
     },
-    // Neumorphism
+    // Neumorphism with Netflix theme
     neumorphic: {
       background: '#141414',
       boxShadow: '8px 8px 16px #0D0D0D, -8px -8px 16px #1B1B1B'
@@ -178,6 +199,97 @@ export const darkTheme = {
       transform: 'translateY(-2px)',
       boxShadow: '0 10px 25px rgba(229, 9, 20, 0.4)',
       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+    },
+    
+    // Digital theme effects
+    cyberpunk: {
+      background: '#141414',
+      border: '1px solid rgba(229, 9, 20, 0.3)',
+      boxShadow: '0 0 15px rgba(229, 9, 20, 0.2), inset 0 0 5px rgba(229, 9, 20, 0.1)',
+      position: 'relative',
+      '&::after': {
+        content: '""',
+        position: 'absolute',
+        top: '0',
+        left: '0',
+        width: '100%',
+        height: '100%',
+        background: 'url("data:image/svg+xml,%3Csvg width=\'100%25\' height=\'100%25\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cdefs%3E%3Cpattern id=\'smallGrid\' width=\'10\' height=\'10\' patternUnits=\'userSpaceOnUse\'%3E%3Cpath d=\'M 10 0 L 0 0 0 10\' fill=\'none\' stroke=\'rgba(229, 9, 20, 0.1)\' stroke-width=\'0.5\'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width=\'100%25\' height=\'100%25\' fill=\'url(%23smallGrid)\'/%3E%3C/svg%3E")',
+        opacity: '0.5',
+        zIndex: '-1'
+      }
+    },
+    digitalBorder: {
+      position: 'relative',
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        inset: '0',
+        padding: '1px',
+        borderRadius: 'inherit',
+        background: 'linear-gradient(90deg, #E50914 0%, transparent 50%, #E50914 100%)',
+        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+        WebkitMaskComposite: 'xor',
+        maskComposite: 'exclude'
+      }
+    },
+    scanline: {
+      position: 'relative',
+      overflow: 'hidden',
+      '&::after': {
+        content: '""',
+        position: 'absolute',
+        top: '0',
+        left: '0',
+        width: '100%',
+        height: '1px',
+        background: 'rgba(229, 9, 20, 0.2)',
+        opacity: '0.5',
+        animation: 'scanline 2s linear infinite'
+      }
+    },
+    dataMatrix: {
+      background: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23E50914' fill-opacity='0.05' fill-rule='evenodd'%3E%3Cpath d='M0 0h20v20H0V0zm20 20h20v20H20V20z'/%3E%3C/g%3E%3C/svg%3E")`,
+      opacity: '0.3'
+    },
+    // New digital effects
+    digitalGlow: {
+      position: 'relative',
+      '&::after': {
+        content: '""',
+        position: 'absolute',
+        inset: '-2px',
+        background: 'transparent',
+        borderRadius: 'inherit',
+        boxShadow: '0 0 15px rgba(229, 9, 20, 0.3), 0 0 30px rgba(229, 9, 20, 0.2)',
+        opacity: '0.8',
+        zIndex: '-1'
+      }
+    },
+    digitalNoise: {
+      position: 'relative',
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        inset: '0',
+        background: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")',
+        opacity: '0.05',
+        mixBlendMode: 'overlay',
+        zIndex: '1',
+        pointerEvents: 'none'
+      }
+    },
+    circuitPattern: {
+      position: 'relative',
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        inset: '0',
+        background: 'url("data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath fill=\'none\' stroke=\'rgba(229, 9, 20, 0.1)\' stroke-width=\'1\' d=\'M10,10 L30,10 L30,30 L50,30 L50,50 L70,50 L70,70 L90,70 M90,30 L70,30 L70,50 L50,50 L50,70 L30,70 L30,90 L10,90\'/%3E%3C/svg%3E")',
+        opacity: '0.2',
+        zIndex: '0',
+        pointerEvents: 'none'
+      }
     }
   }
 };
