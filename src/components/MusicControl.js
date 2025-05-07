@@ -223,7 +223,11 @@ const MusicControl = () => {
     <MusicControlContainer
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 1 }}
+      transition={{ 
+        duration: 0.5, 
+        delay: 1,
+        ease: [0.22, 1, 0.36, 1] 
+      }}
     >
       <AnimatePresence>
         {showVolumeControl && (
@@ -231,7 +235,10 @@ const MusicControl = () => {
             initial={{ opacity: 0, scale: 0.8, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 10 }}
-            transition={{ duration: 0.2 }}
+            transition={{ 
+              duration: 0.3,
+              ease: [0.33, 1, 0.68, 1]
+            }}
           >
             <VolumeSlider
               value={volume * 100}
@@ -242,8 +249,8 @@ const MusicControl = () => {
       </AnimatePresence>
       
       <MusicButton
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.1, translateZ: 0 }}
+        whileTap={{ scale: 0.95, translateZ: 0 }}
         onClick={handleMusicToggle}
         onMouseEnter={() => setShowLabel(true)}
         onMouseLeave={() => setShowLabel(false)}
@@ -257,7 +264,10 @@ const MusicControl = () => {
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 5 }}
-              transition={{ duration: 0.2 }}
+              transition={{ 
+                duration: 0.2,
+                ease: [0.33, 1, 0.68, 1]
+              }}
             >
               {isLoading ? 'Loading...' : isMusicPlaying ? 'Pause Music' : 'Play Music'}
             </MusicLabel>

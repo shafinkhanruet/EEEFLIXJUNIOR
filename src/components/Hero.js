@@ -540,9 +540,14 @@ const Hero = () => {
   
   // Scroll to content function
   const scrollToContent = () => {
-    window.scrollTo({
+    const scrollOptions = {
       top: window.innerHeight,
-      behavior: 'smooth'
+      behavior: 'smooth',
+    };
+    
+    // Use requestAnimationFrame for smoother animations
+    requestAnimationFrame(() => {
+      window.scrollTo(scrollOptions);
     });
   };
   

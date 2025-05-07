@@ -16,6 +16,7 @@ import Footer from './components/Footer';
 import LoadingSpinner from './components/LoadingSpinner';
 import DigitalOverlay from './components/DigitalOverlay';
 import MusicControl from './components/MusicControl';
+import ScrollToTop from './components/ScrollToTop';
 
 // Lazy loaded components
 const SplashScreen = lazy(() => import('./components/SplashScreen'));
@@ -249,33 +250,28 @@ function App() {
           <AppContainer>
             <BackgroundContainer />
             
-            {/* Always show the DigitalOverlay component */}
-            {ENABLE_PREMIUM_DIGITAL_EFFECTS && <DigitalOverlay />}
-            
-            {/* Add Music Control component */}
-            {showUI && <MusicControl />}
-            
-            {/* Scanline effect */}
+            {/* Digital effects */}
             {ENABLE_PREMIUM_DIGITAL_EFFECTS && (
               <>
-                <Scanline 
+                <Scanline
                   variants={scanlineVariants}
                   initial="initial"
                   animate="animate"
                   transition={{
                     repeat: Infinity,
-                    duration: 4,
+                    duration: 5,
                     ease: "linear"
                   }}
                 />
                 <DigitalGrid />
                 <CRTFlicker />
+                <DigitalOverlay enabled={true} />
               </>
             )}
             
-            {/* Show splash screen if needed */}
+            {/* Show Splash Screen */}
             <AnimatePresence mode="wait">
-              {showSplash && (
+              {showSplash && !splashError && (
                 <Suspense fallback={<LoadingSpinner />}>
                   <SplashScreen 
                     onComplete={handleSplashComplete} 
@@ -284,45 +280,75 @@ function App() {
                 </Suspense>
               )}
             </AnimatePresence>
-
-            {/* Primary UI elements */}
-            {showUI && (
-              <>
-                <Navbar />
-                <MainContent
-                  variants={contentVariants}
+            
+            {/* Main app content */}
+            <AnimatePresence mode="wait">
+              {showUI && contentReady && (
+                <motion.div
                   initial="hidden"
                   animate="visible"
                   exit="exit"
+                  variants={contentVariants}
+                  style={{ width: '100%', height: '100%' }}
                 >
-                  <AnimatePresence mode="wait">
-                    <PageTransition
-                      key={location.pathname}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ 
-                        duration: 0.3,
-                        ease: [0.43, 0.13, 0.23, 0.96]
-                      }}
-                    >
-                      <Suspense fallback={<LoadingSpinner />}>
+                  <Navbar scrolled={location.pathname !== '/'} />
+                  
+                  <MainContent>
+                    <AnimatePresence mode="wait">
+                      <PageTransition
+                        key={location.pathname}
+                        initial={{ opacity: 0, filter: "blur(8px)" }}
+                        animate={{ opacity: 1, filter: "blur(0px)" }}
+                        exit={{ opacity: 0, filter: "blur(4px)" }}
+                        transition={{ 
+                          duration: 0.4,
+                          ease: [0.33, 1, 0.68, 1]  // cubic-bezier for smoother motion
+                        }}
+                      >
                         <Routes location={location}>
-                          <Route path="/" element={<Home />} />
-                          <Route path="/students" element={<Students />} />
-                          <Route path="/student/:id" element={<StudentProfile />} />
-                          <Route path="/about" element={<About />} />
-                          <Route path="/contact" element={<Contact />} />
-                          <Route path="/resources" element={<Resources />} />
-                          <Route path="/contact-manager" element={<StudentContactManager />} />
+                          <Route path="/" element={
+                            <Suspense fallback={<LoadingSpinner />}>
+                              <Home />
+                            </Suspense>
+                          } />
+                          <Route path="/students" element={
+                            <Suspense fallback={<LoadingSpinner />}>
+                              <Students />
+                            </Suspense>
+                          } />
+                          <Route path="/student/:id" element={
+                            <Suspense fallback={<LoadingSpinner />}>
+                              <StudentProfile />
+                            </Suspense>
+                          } />
+                          <Route path="/about" element={
+                            <Suspense fallback={<LoadingSpinner />}>
+                              <About />
+                            </Suspense>
+                          } />
+                          <Route path="/contact" element={
+                            <Suspense fallback={<LoadingSpinner />}>
+                              <Contact />
+                            </Suspense>
+                          } />
+                          <Route path="/resources" element={
+                            <Suspense fallback={<LoadingSpinner />}>
+                              <Resources />
+                            </Suspense>
+                          } />
                         </Routes>
-                      </Suspense>
-                    </PageTransition>
-                  </AnimatePresence>
-                </MainContent>
-                <Footer />
-              </>
-            )}
+                      </PageTransition>
+                    </AnimatePresence>
+                  </MainContent>
+                  
+                  <Footer />
+                  <MusicControl />
+                  <ScrollToTop />
+                </motion.div>
+              )}
+            </AnimatePresence>
+            
+            {!showSplash && !showUI && <LoadingSpinner />}
           </AppContainer>
         </SoundContext.Provider>
       </AudioProvider>

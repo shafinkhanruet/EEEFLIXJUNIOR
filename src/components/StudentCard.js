@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaUser, FaCrown, FaCode } from 'react-icons/fa';
+import { FaUser, FaCrown, FaCode, FaStar, FaPlus } from 'react-icons/fa';
+import useIntersectionObserver from '../hooks/useIntersectionObserver';
 
 const CardContainer = styled(motion.div)`
   position: relative;
@@ -234,10 +235,10 @@ const ProfileImage = styled(motion.div)`
   filter: contrast(1.1) brightness(0.9) saturate(1.1);
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
-  will-change: transform, filter;
+  will-change: transform, filter, opacity;
   
   ${CardContainer}:hover & {
-    transform: scale(1.08) rotate(1deg);
+    transform: scale(1.05) translateZ(0);
     filter: contrast(1.2) brightness(1) saturate(1.3);
     animation: subtleShift 4s ease-in-out infinite alternate;
   }
@@ -528,6 +529,12 @@ const StudentCard = ({ student, delay = 0, playSound }) => {
   const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
   const [isBottomHovered, setIsBottomHovered] = useState(false);
   const cardRef = useRef(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const { elementRef, inView } = useIntersectionObserver({
+    threshold: 0.1,
+    rootMargin: '200px', // Start loading earlier for smoother experience
+    freezeOnceVisible: true
+  });
 
   // Card tilt effect
   const handleTilt = (e) => {
@@ -567,24 +574,40 @@ const StudentCard = ({ student, delay = 0, playSound }) => {
     }
   }, [safeStudent.image]);
 
+  // Preload image when in view
+  useEffect(() => {
+    if (inView && !imageLoaded) {
+      const img = new Image();
+      img.src = safeStudent.image;
+      img.onload = () => setImageLoaded(true);
+    }
+  }, [inView, safeStudent.image, imageLoaded]);
+
   const cardVariants = {
     hidden: { 
-      opacity: 0,
-      y: 20,
-      scale: 0.95
+      opacity: 0, 
+      y: 30,
+      filter: 'blur(10px)',
+      transition: { duration: 0.3 }
     },
-    visible: {
-      opacity: 1,
+    visible: { 
+      opacity: 1, 
       y: 0,
-      scale: 1,
-      transition: {
-        duration: 0.6,
-        ease: [0.4, 0, 0.2, 1],
-        scale: {
-          type: "spring",
-          damping: 12,
-          stiffness: 100
-        }
+      filter: 'blur(0px)',
+      transition: { 
+        duration: 0.5,
+        ease: [0.25, 0.1, 0.25, 1.0], // Cubic bezier for smoother motion
+        staggerChildren: 0.1
+      }
+    },
+    hover: {
+      scale: 1.02,
+      y: -5,
+      transition: { 
+        type: 'spring', 
+        stiffness: 300, 
+        damping: 20,
+        mass: 0.8
       }
     }
   };

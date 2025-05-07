@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { SoundContext } from '../contexts/SoundContext';
+import useScrollOptimizer from '../hooks/useScrollOptimizer';
 
 // Import the logo directly
 import eeeflixLogo from '../assets/images/logos/eeeflix-logo.png';
@@ -15,6 +16,7 @@ const NavContainer = styled(motion.nav)`
   width: 100%;
   z-index: 100;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(${props => props.hide ? '-100%' : '0'});
   background: ${props => props.scrolled 
     ? 'rgba(10, 10, 20, 0.85)' 
     : 'linear-gradient(to bottom, rgba(10, 10, 20, 0.8) 0%, transparent 100%)'
@@ -282,27 +284,32 @@ const MobileNavLink = styled(NavLink)`
 const Navbar = ({ scrolled: propScrolled, toggleDigitalOverlay }) => {
   const [scrolled, setScrolled] = useState(propScrolled || false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [hideNav, setHideNav] = useState(false);
   const location = useLocation();
   const soundContext = useContext(SoundContext);
   // Set default sound functions to prevent errors
   const playSound = soundContext?.playSound || (() => {});
   const [logoLoaded, setLogoLoaded] = useState(true);
+  
+  // Use the scroll optimizer hook for better performance
+  const { scrollPosition, scrollDirection } = useScrollOptimizer();
 
+  // Use the scrollPosition and scrollDirection from the hook
   useEffect(() => {
-    const handleScroll = () => {
-      const offset = window.scrollY;
-      if (offset > 50) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
+    // Show/hide navbar based on scroll direction
+    if (scrollDirection === 'down' && scrollPosition.y > 150 && !mobileMenuOpen) {
+      setHideNav(true);
+    } else {
+      setHideNav(false);
+    }
+    
+    // Update scrolled state
+    if (scrollPosition.y > 50) {
+      setScrolled(true);
+    } else {
+      setScrolled(false);
+    }
+  }, [scrollPosition, scrollDirection, mobileMenuOpen]);
 
   const handleLinkClick = () => {
     // Safely call playSound with a check
@@ -392,6 +399,7 @@ const Navbar = ({ scrolled: propScrolled, toggleDigitalOverlay }) => {
       animate="visible"
       variants={navVariants}
       scrolled={scrolled}
+      hide={hideNav}
     >
       <NavContent scrolled={scrolled}>
         <Logo 
