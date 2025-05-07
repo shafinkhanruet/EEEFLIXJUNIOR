@@ -8,12 +8,14 @@ import { darkTheme } from './theme';
 
 // Context
 import { SoundContext } from './contexts/SoundContext';
+import { AudioProvider } from './contexts/AudioContext';
 
 // Components - Import synchronously for faster initial load
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import LoadingSpinner from './components/LoadingSpinner';
 import DigitalOverlay from './components/DigitalOverlay';
+import MusicControl from './components/MusicControl';
 
 // Lazy loaded components
 const SplashScreen = lazy(() => import('./components/SplashScreen'));
@@ -240,66 +242,90 @@ function App() {
 
   return (
     <ThemeProvider theme={darkTheme}>
-      <SoundContext.Provider value={soundContextValue}>
-        <TransitionStyle />
-        <DigitalOverlays />
-        <AppContainer>
-          <BackgroundContainer />
-          
-          {/* Always show the DigitalOverlay component */}
-          {ENABLE_PREMIUM_DIGITAL_EFFECTS && <DigitalOverlay />}
-          
-          {/* Original digital effects */}
-          <Scanline
-            initial={{ top: '-2px' }}
-            animate={{ top: '100vh' }}
-            transition={{
-              duration: 6,
-              repeat: Infinity,
-              ease: 'linear',
-            }}
-          />
-          <DigitalGrid />
-          <CRTFlicker />
-          
-          {/* Main content */}
-          {showUI && (
-            <>
-              <Navbar />
-              
-              <MainContent>
-                <AnimatePresence mode="wait">
-                  <Suspense fallback={<LoadingSpinner />}>
-                    <Routes location={location} key={location.pathname}>
-                      <Route path="/" element={<Home />} />
-                      <Route path="/students" element={<Students />} />
-                      <Route path="/about" element={<About />} />
-                      <Route path="/contact" element={<Contact />} />
-                      <Route path="/resources" element={<Resources />} />
-                      <Route path="/students/:id" element={<StudentProfile />} />
-                      <Route path="/student-contact-manager" element={<StudentContactManager />} />
-                    </Routes>
-                  </Suspense>
-                </AnimatePresence>
-              </MainContent>
-              
-              <Footer />
-            </>
-          )}
-          
-          {/* Splash screen */}
-          <AnimatePresence>
-            {showSplash && (
-              <Suspense fallback={null}>
-                <SplashScreen 
-                  onComplete={handleSplashComplete} 
-                  onError={() => handleSplashError()}
+      <AudioProvider>
+        <SoundContext.Provider value={soundContextValue}>
+          <TransitionStyle />
+          <DigitalOverlays />
+          <AppContainer>
+            <BackgroundContainer />
+            
+            {/* Always show the DigitalOverlay component */}
+            {ENABLE_PREMIUM_DIGITAL_EFFECTS && <DigitalOverlay />}
+            
+            {/* Add Music Control component */}
+            {showUI && <MusicControl />}
+            
+            {/* Scanline effect */}
+            {ENABLE_PREMIUM_DIGITAL_EFFECTS && (
+              <>
+                <Scanline 
+                  variants={scanlineVariants}
+                  initial="initial"
+                  animate="animate"
+                  transition={{
+                    repeat: Infinity,
+                    duration: 4,
+                    ease: "linear"
+                  }}
                 />
-              </Suspense>
+                <DigitalGrid />
+                <CRTFlicker />
+              </>
             )}
-          </AnimatePresence>
-        </AppContainer>
-      </SoundContext.Provider>
+            
+            {/* Show splash screen if needed */}
+            <AnimatePresence mode="wait">
+              {showSplash && (
+                <Suspense fallback={<LoadingSpinner />}>
+                  <SplashScreen 
+                    onComplete={handleSplashComplete} 
+                    onError={handleSplashError}
+                  />
+                </Suspense>
+              )}
+            </AnimatePresence>
+
+            {/* Primary UI elements */}
+            {showUI && (
+              <>
+                <Navbar />
+                <MainContent
+                  variants={contentVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                >
+                  <AnimatePresence mode="wait">
+                    <PageTransition
+                      key={location.pathname}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ 
+                        duration: 0.3,
+                        ease: [0.43, 0.13, 0.23, 0.96]
+                      }}
+                    >
+                      <Suspense fallback={<LoadingSpinner />}>
+                        <Routes location={location}>
+                          <Route path="/" element={<Home />} />
+                          <Route path="/students" element={<Students />} />
+                          <Route path="/student/:id" element={<StudentProfile />} />
+                          <Route path="/about" element={<About />} />
+                          <Route path="/contact" element={<Contact />} />
+                          <Route path="/resources" element={<Resources />} />
+                          <Route path="/contact-manager" element={<StudentContactManager />} />
+                        </Routes>
+                      </Suspense>
+                    </PageTransition>
+                  </AnimatePresence>
+                </MainContent>
+                <Footer />
+              </>
+            )}
+          </AppContainer>
+        </SoundContext.Provider>
+      </AudioProvider>
     </ThemeProvider>
   );
 }

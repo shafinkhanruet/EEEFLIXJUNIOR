@@ -319,6 +319,28 @@ const PremiumBadge = styled(motion.div)`
       opacity: 0.8;
     }
   }
+  
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    width: 30px;
+    height: 30px;
+    top: 0.8rem;
+    left: 0.8rem;
+    
+    svg {
+      font-size: 0.9rem;
+    }
+  }
+  
+  @media (max-width: ${props => props.theme.breakpoints.smallMobile}) {
+    width: 26px;
+    height: 26px;
+    top: 0.7rem;
+    left: 0.7rem;
+    
+    svg {
+      font-size: 0.8rem;
+    }
+  }
 `;
 
 // Enhance ContentContainer with 3D effects
@@ -355,6 +377,14 @@ const ContentContainer = styled(motion.div)`
     &:before {
       opacity: 0.9;
     }
+  }
+  
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    padding: 1.5rem 1.2rem;
+  }
+  
+  @media (max-width: ${props => props.theme.breakpoints.smallMobile}) {
+    padding: 1.2rem 1rem;
   }
 `;
 
@@ -399,6 +429,17 @@ const UserName = styled(motion.h3)`
       width: 100%;
     }
   }
+  
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    font-size: 1.1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  @media (max-width: ${props => props.theme.breakpoints.smallMobile}) {
+    font-size: 1rem;
+  }
 `;
 
 // Update UserId with 3D effect
@@ -432,6 +473,14 @@ const UserId = styled(motion.span)`
     background-clip: text;
     -webkit-text-fill-color: transparent;
     text-shadow: none;
+  }
+  
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    font-size: 0.85rem;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 `;
 

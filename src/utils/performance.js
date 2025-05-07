@@ -1,144 +1,253 @@
 /**
- * Performance utility functions for EEEFlix
+ * Performance optimization utilities for smooth animations and interactions
  */
 
-// Debounce function to limit how often a function can be called
-export const debounce = (func, wait) => {
-  let timeout;
-  return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
-};
-
-// Throttle function to ensure a function is called at most once in a specified time period
-export const throttle = (func, limit) => {
-  let inThrottle;
+// Throttle function to limit execution frequency
+export const throttle = (callback, delay = 16) => {
+  let lastCall = 0;
+  
   return function(...args) {
-    if (!inThrottle) {
-      func(...args);
-      inThrottle = true;
-      setTimeout(() => inThrottle = false, limit);
+    const now = Date.now();
+    if (now - lastCall >= delay) {
+      lastCall = now;
+      return callback(...args);
     }
   };
 };
 
-// Image preloading function with timeout to prevent hanging requests
-export const preloadImage = (src, timeout = 5000) => {
+// Debounce function to delay execution until after a pause
+export const debounce = (callback, delay = 100) => {
+  let timeoutId;
+  
+  return function(...args) {
+    clearTimeout(timeoutId);
+    
+    timeoutId = setTimeout(() => {
+      callback(...args);
+    }, delay);
+  };
+};
+
+// RAF (requestAnimationFrame) based throttle for smoother animations
+export const rafThrottle = (callback) => {
+  let scheduled = false;
+  
+  return function(...args) {
+    if (scheduled) return;
+    
+    scheduled = true;
+    
+    requestAnimationFrame(() => {
+      callback(...args);
+      scheduled = false;
+    });
+  };
+};
+
+// Detect browser capabilities for optimized rendering
+export const detectBrowserCapabilities = () => {
+  const capabilities = {
+    supportsWebP: false,
+    supportsAvif: false,
+    supportsTouchEvents: false,
+    supportsPassiveEvents: false,
+    devicePixelRatio: 1,
+    isHighEndDevice: false,
+    isLowEndDevice: false,
+    prefersReducedMotion: false
+  };
+  
+  // Check for passive event support
+  try {
+    const options = {
+      get passive() {
+        capabilities.supportsPassiveEvents = true;
+        return true;
+      }
+    };
+    
+    window.addEventListener('test', null, options);
+    window.removeEventListener('test', null, options);
+  } catch (err) {
+    capabilities.supportsPassiveEvents = false;
+  }
+  
+  // Touch event support
+  capabilities.supportsTouchEvents = 'ontouchstart' in window || 
+    navigator.maxTouchPoints > 0 || 
+    navigator.msMaxTouchPoints > 0;
+  
+  // Device pixel ratio
+  capabilities.devicePixelRatio = window.devicePixelRatio || 1;
+  
+  // High/low end device detection
+  // Simple heuristic based on pixel ratio and memory
+  if (navigator.deviceMemory) {
+    capabilities.isLowEndDevice = navigator.deviceMemory < 4 && capabilities.devicePixelRatio <= 2;
+    capabilities.isHighEndDevice = navigator.deviceMemory >= 8 && capabilities.devicePixelRatio >= 2;
+  } else {
+    capabilities.isLowEndDevice = capabilities.devicePixelRatio < 2;
+    capabilities.isHighEndDevice = capabilities.devicePixelRatio >= 3;
+  }
+  
+  // Reduced motion preference
+  capabilities.prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  
+  return capabilities;
+};
+
+// Apply performance optimizations based on device capabilities
+export const applyPerformanceOptimizations = () => {
+  const capabilities = detectBrowserCapabilities();
+  
+  // Add performance-related classes to the body for CSS optimizations
+  if (capabilities.isLowEndDevice) {
+    document.body.classList.add('low-end-device');
+  }
+  
+  if (capabilities.isHighEndDevice) {
+    document.body.classList.add('high-end-device');
+  }
+  
+  if (capabilities.prefersReducedMotion) {
+    document.body.classList.add('reduced-motion');
+  }
+  
+  // Optimize event listeners for touch devices
+  if (capabilities.supportsTouchEvents) {
+    document.body.classList.add('touch-device');
+  }
+  
+  return capabilities;
+};
+
+// Apply rAF (requestAnimationFrame) based scroll listener for smoother performance
+export const createSmoothScrollListener = (callback) => {
+  let ticking = false;
+  let lastKnownScrollPosition = 0;
+  
+  const onScroll = () => {
+    lastKnownScrollPosition = window.scrollY;
+    
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        callback(lastKnownScrollPosition);
+        ticking = false;
+      });
+      
+      ticking = true;
+    }
+  };
+  
+  window.addEventListener('scroll', onScroll, capabilities.supportsPassiveEvents ? { passive: true } : false);
+  
+  return () => {
+    window.removeEventListener('scroll', onScroll);
+  };
+};
+
+// Check if element is in viewport for optimized intersection handling
+export const isElementInViewport = (element, threshold = 0) => {
+  if (!element) return false;
+  
+  const rect = element.getBoundingClientRect();
+  const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+  
+  // Check if element is in viewport with threshold
+  return (
+    rect.top <= windowHeight * (1 - threshold) &&
+    rect.bottom >= windowHeight * threshold
+  );
+};
+
+// Apply will-change property strategically for better GPU acceleration
+export const optimizeForAnimation = (element, property = 'transform', duration = 300) => {
+  if (!element) return null;
+  
+  // Apply will-change property before animation
+  element.style.willChange = property;
+  
+  // Clear will-change after animation completes to free GPU resources
+  const cleanup = () => {
+    setTimeout(() => {
+      element.style.willChange = 'auto';
+    }, duration);
+  };
+  
+  return cleanup;
+};
+
+// Use Intersection Observer for optimized animations on scroll
+export const createScrollAnimationObserver = (callback, options = {}) => {
+  const defaultOptions = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.1
+  };
+  
+  const mergedOptions = { ...defaultOptions, ...options };
+  
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => callback(entry));
+  }, mergedOptions);
+  
+  return {
+    observe: (element) => {
+      if (element) observer.observe(element);
+    },
+    unobserve: (element) => {
+      if (element) observer.unobserve(element);
+    },
+    disconnect: () => observer.disconnect()
+  };
+};
+
+// Utility to preload images for smoother transitions
+export const preloadImage = (src) => {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    let timer;
-    
-    img.onload = () => {
-      clearTimeout(timer);
-      resolve(img);
-    };
-    
-    img.onerror = () => {
-      clearTimeout(timer);
-      reject(new Error(`Failed to load image: ${src}`));
-    };
-    
-    // Set timeout to avoid hanging on slow connections
-    timer = setTimeout(() => {
-      img.src = ''; // Cancel the request
-      reject(new Error(`Image load timeout: ${src}`));
-    }, timeout);
-    
+    img.onload = () => resolve(img);
+    img.onerror = reject;
     img.src = src;
   });
 };
 
-// Batch preload multiple images with priority and chunking
-export const preloadImages = async (sources, chunkSize = 5) => {
-  // Process images in chunks to avoid overwhelming the browser
-  const results = [];
+// Batch preload images for better performance
+export const preloadImages = (sources) => {
+  return Promise.all(sources.map(src => preloadImage(src)));
+};
+
+// Enable hardware acceleration globally for smoother animations
+export const enableHardwareAcceleration = () => {
+  const style = document.createElement('style');
   
-  for (let i = 0; i < sources.length; i += chunkSize) {
-    const chunk = sources.slice(i, i + chunkSize);
-    try {
-      // Process each chunk in parallel, but chunks sequentially
-      const chunkResults = await Promise.allSettled(
-        chunk.map(src => preloadImage(src))
-      );
-      results.push(...chunkResults);
-    } catch (error) {
-      console.error('Error preloading image chunk:', error);
+  style.textContent = `
+    .hw-accelerated {
+      transform: translateZ(0);
+      will-change: transform;
+      backface-visibility: hidden;
     }
-  }
+  `;
   
-  return results;
+  document.head.appendChild(style);
 };
 
-// Check if the browser supports WebP format
-export const supportsWebP = () => {
-  const elem = document.createElement('canvas');
-  if (elem.getContext && elem.getContext('2d')) {
-    return elem.toDataURL('image/webp').indexOf('data:image/webp') === 0;
-  }
-  return false;
-};
+// Apply optimizations right away
+const capabilities = applyPerformanceOptimizations();
+enableHardwareAcceleration();
 
-// Get optimized image path based on device capabilities and screen size
-export const getOptimizedImagePath = (path, supportsWebP) => {
-  if (!path) return `${process.env.PUBLIC_URL}/assets/images/avatar/default-avatar.jpg`;
-  
-  // If path already contains PUBLIC_URL, don't add it again
-  if (path.includes(process.env.PUBLIC_URL)) {
-    return path;
-  }
-  
-  // Extract the base path and extension
-  const basePath = path.substring(0, path.lastIndexOf('.')) || path;
-  const extension = path.substring(path.lastIndexOf('.')) || '';
-  
-  // For avatar images, always use jpg format directly
-  if (path.includes('/avatar/') || path.includes('avatar/')) {
-    return path;
-  }
-  
-  // For other images, use WebP if supported
-  if (supportsWebP && ['.jpg', '.jpeg', '.png'].some(ext => extension.toLowerCase() === ext)) {
-    return `${basePath}.webp`;
-  }
-  
-  // Check if we should use a smaller image based on screen size
-  const screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-  
-  if (screenWidth <= 768 && (path.includes('/avatar/') || path.includes('avatar/'))) {
-    // For mobile devices, use smaller images if available
-    if (path.includes('/avatar/')) {
-      return path.replace('/avatar/', '/avatar/small/');
-    } else {
-      return path.replace('avatar/', 'avatar/small/');
-    }
-  }
-  
-  return path;
-};
-
-// Intersection Observer utility for lazy loading with enhanced options
-export const createIntersectionObserver = (callback, options = {}) => {
-  const defaultOptions = {
-    root: null,
-    rootMargin: '200px', // Increased rootMargin to start loading earlier
-    threshold: 0.01     // Lower threshold to trigger loading sooner
-  };
-  
-  return new IntersectionObserver(callback, { ...defaultOptions, ...options });
-};
-
-// Measure component render time (development only)
-export const measureRenderTime = (Component) => {
-  return (props) => {
-    const start = performance.now();
-    const result = Component(props);
-    const end = performance.now();
-    console.log(`Render time for ${Component.name}: ${end - start}ms`);
-    return result;
-  };
+export default {
+  throttle,
+  debounce,
+  rafThrottle,
+  detectBrowserCapabilities,
+  applyPerformanceOptimizations,
+  createSmoothScrollListener,
+  isElementInViewport,
+  optimizeForAnimation,
+  createScrollAnimationObserver,
+  preloadImage,
+  preloadImages,
+  enableHardwareAcceleration,
+  capabilities
 };

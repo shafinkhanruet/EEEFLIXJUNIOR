@@ -123,9 +123,19 @@ const RowContainer = styled.div`
   padding: 0 4rem;
   margin-bottom: 4rem;
   
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    padding: 0 2.5rem;
+    margin-bottom: 3.5rem;
+  }
+  
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     padding: 0 1.5rem;
     margin-bottom: 3rem;
+  }
+  
+  @media (max-width: ${props => props.theme.breakpoints.smallMobile}) {
+    padding: 0 1rem;
+    margin-bottom: 2.5rem;
   }
 `;
 
@@ -141,8 +151,13 @@ const Row = styled(motion.div)`
   }
   
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 15px;
+  }
+  
+  @media (max-width: ${props => props.theme.breakpoints.smallMobile}) {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
   }
 `;
 
@@ -154,7 +169,11 @@ const FeaturedRow = styled(Row)`
   }
   
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+  
+  @media (max-width: ${props => props.theme.breakpoints.smallMobile}) {
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
   }
 `;
 

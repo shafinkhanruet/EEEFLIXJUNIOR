@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
 import styled from 'styled-components';
 import { motion, useAnimation, useTransform, useScroll, AnimatePresence } from 'framer-motion';
-import { FaPlay, FaInfoCircle, FaArrowDown } from 'react-icons/fa';
+import { FaPlay, FaInfoCircle, FaArrowDown, FaMusic } from 'react-icons/fa';
 import { useInView } from 'react-intersection-observer';
 import { SoundContext } from '../contexts/SoundContext';
+import { AudioContext } from '../contexts/AudioContext';
 
 // Import the logo directly
 import circuitsLogo from '../assets/images/logos/circuits-of-minds-logo.png';
@@ -487,6 +488,59 @@ const ScrollIndicator = styled(motion.div)`
   }
 `;
 
+// Add new styled component for music notification
+const MusicNotification = styled(motion.div)`
+  position: absolute;
+  top: 90px;
+  right: 30px;
+  background: rgba(20, 20, 20, 0.8);
+  backdrop-filter: blur(8px);
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  border: 1px solid rgba(229, 9, 20, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  max-width: 300px;
+  z-index: 10;
+  
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    top: 80px;
+    right: 20px;
+    left: 20px;
+    max-width: none;
+  }
+`;
+
+const MusicIcon = styled(FaMusic)`
+  color: #E50914;
+  flex-shrink: 0;
+`;
+
+const NotificationText = styled.p`
+  font-size: 0.9rem;
+  margin: 0;
+  line-height: 1.4;
+`;
+
+const NotificationButton = styled(motion.button)`
+  background: #E50914;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  margin-left: auto;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.8rem;
+  
+  &:hover {
+    background: #c20710;
+  }
+`;
+
 // Generate random particles
 const generateParticles = (count) => {
   return Array.from({ length: count }, (_, i) => ({
@@ -510,6 +564,12 @@ const Hero = () => {
   const [isMounted, setIsMounted] = useState(false);
   const [logoLoaded, setLogoLoaded] = useState(true);
   const [particles, setParticles] = useState([]);
+  
+  // Get audio context
+  const { toggleMusic, isMusicPlaying } = useContext(AudioContext);
+  
+  // Add state for music notification
+  const [showMusicNotification, setShowMusicNotification] = useState(true);
   
   useEffect(() => {
     setIsMounted(true);
@@ -673,8 +733,46 @@ const Hero = () => {
   
   const title = "EEEFLIX";
   
+  // Add useEffect to automatically hide notification after delay
+  useEffect(() => {
+    if (showMusicNotification) {
+      const timer = setTimeout(() => {
+        setShowMusicNotification(false);
+      }, 10000); // Hide after 10 seconds
+      
+      return () => clearTimeout(timer);
+    }
+  }, [showMusicNotification]);
+  
   return (
     <HeroContainer ref={ref}>
+      {/* Music notification */}
+      <AnimatePresence>
+        {showMusicNotification && (
+          <MusicNotification
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <MusicIcon />
+            <NotificationText>
+              Experience "Circuits of Minds" with our background music.
+            </NotificationText>
+            <NotificationButton
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                toggleMusic();
+                setShowMusicNotification(false);
+              }}
+            >
+              {isMusicPlaying ? 'Pause' : 'Play'}
+            </NotificationButton>
+          </MusicNotification>
+        )}
+      </AnimatePresence>
+      
       <HeroBackground 
         style={{ 
           scale: backgroundScale,

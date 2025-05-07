@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext, useRef } from 'react';
 import styled from 'styled-components';
-import { motion, useAnimation, useScroll, useTransform, useInView } from 'framer-motion';
+import { motion, useAnimation, useScroll, useTransform, useInView, useMotionValue } from 'framer-motion';
 import { SoundContext } from '../contexts/SoundContext';
 
 // Components
@@ -436,6 +436,48 @@ const Home = () => {
   // Add state for class representatives
   const [classReps, setClassReps] = useState([]);
   
+  // Add framer-motion's useMotionValue for cursor tracking
+  const cursorX = useMotionValue(0);
+  const cursorY = useMotionValue(0);
+  
+  // Use throttle for performance
+  const throttledCursorUpdate = useRef(null);
+  
+  // Track cursor position for interactive elements
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      throttledCursorUpdate.current = throttle((e) => {
+        cursorX.set(e.clientX);
+        cursorY.set(e.clientY);
+      }, 10);
+      
+      window.addEventListener('mousemove', throttledCursorUpdate.current);
+      
+      return () => {
+        window.removeEventListener('mousemove', throttledCursorUpdate.current);
+      };
+    }
+  }, []);
+  
+  // Function to throttle frequent events for performance
+  function throttle(callback, delay) {
+    let lastCall = 0;
+    return function(...args) {
+      const now = Date.now();
+      if (now - lastCall >= delay) {
+        lastCall = now;
+        callback(...args);
+      }
+    };
+  }
+  
+  // Optimize animations with useInView for progressive loading
+  const heroRef = useRef(null);
+  const crSectionRef = useRef(null);
+  
+  const heroInView = useInView(heroRef, { once: true });
+  const crInView = useInView(crSectionRef, { once: true, threshold: 0.2 });
+  
   // Handle intro video completion
   const handleIntroComplete = () => {
     setIsIntroComplete(true);
@@ -479,30 +521,40 @@ const Home = () => {
     }
   }, [studentsInView, featuresInView, studentControls, featuresControls, isMounted]);
   
-  // Improved variants for animations
+  // Optimize animation variants for smoother transitions
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3,
-        duration: 0.6,
-        ease: [0.43, 0.13, 0.23, 0.96]
+        staggerChildren: 0.15,
+        delayChildren: 0.2,
+        duration: 0.5,
+        ease: [0.25, 0.1, 0.25, 1.0] // Use cubic-bezier for smoother easing
       }
     }
   };
   
   const itemVariants = {
-    hidden: { opacity: 0, y: 30, scale: 0.95 },
+    hidden: { opacity: 0, y: 20, scale: 0.98 },
     visible: {
       opacity: 1,
       y: 0,
       scale: 1,
       transition: { 
-        duration: 0.8, 
-        ease: [0.43, 0.13, 0.23, 0.96]
+        duration: 0.6, 
+        ease: [0.25, 0.1, 0.25, 1.0]
       }
+    }
+  };
+  
+  // Add smooth hover transitions
+  const hoverTransition = {
+    y: -10,
+    scale: 1.02,
+    transition: { 
+      duration: 0.4, 
+      ease: [0.25, 0.1, 0.25, 1.0]
     }
   };
   
@@ -516,36 +568,50 @@ const Home = () => {
 
   return (
     <PageContainer>
-      {/* Scroll Progress Bar */}
-      <ScrollProgress style={{ scaleX, willChange: 'transform' }} />
+      {/* Scroll Progress Bar - smoother animation */}
+      <ScrollProgress 
+        style={{ 
+          scaleX, 
+          willChange: 'transform',
+          transformOrigin: 'left'
+        }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5, duration: 0.6 }}
+      />
       
-      {/* Background Effect */}
+      {/* Background Effect - optimized for performance */}
       <BackgroundWrapper>
         <ParallaxBackground />
-        {/* Floating gradient elements */}
+        {/* Floating gradient elements with smoother animations */}
         <FloatingGradient 
           style={{ 
             x: useTransform(scrollYProgress, [0, 1], ['-10%', '30%']),
             y: useTransform(scrollYProgress, [0, 1], ['10%', '60%']),
-            scale: useTransform(scrollYProgress, [0, 0.5, 1], [1, 1.5, 1])
+            scale: useTransform(scrollYProgress, [0, 0.5, 1], [1, 1.5, 1]),
+            opacity: useTransform(scrollYProgress, [0, 0.5, 1], [0.3, 0.6, 0.3])
           }} 
         />
         <FloatingGradient 
           style={{ 
             x: useTransform(scrollYProgress, [0, 1], ['80%', '50%']),
             y: useTransform(scrollYProgress, [0, 1], ['30%', '70%']),
-            scale: useTransform(scrollYProgress, [0, 0.5, 1], [1.2, 0.8, 1.4])
+            scale: useTransform(scrollYProgress, [0, 0.5, 1], [1.2, 0.8, 1.4]),
+            opacity: useTransform(scrollYProgress, [0, 0.5, 1], [0.4, 0.7, 0.5])
           }} 
         />
       </BackgroundWrapper>
       
-      {/* Hero Section */}
-      <Hero />
+      {/* Hero Section with ref for inView animation */}
+      <div ref={heroRef}>
+        <Hero />
+      </div>
       
-      {/* Class Representatives Section */}
+      {/* Class Representatives Section - enhanced animations */}
       <SectionWrapper
+        ref={crSectionRef}
         initial="hidden"
-        animate="visible"
+        animate={crInView ? "visible" : "hidden"}
         variants={containerVariants}
       >
         <CRSectionWrapper>
@@ -562,7 +628,7 @@ const Home = () => {
                 <CRCardWrapper 
                   key={cr?.id || `cr-${index}`} 
                   variants={itemVariants}
-                  whileHover={{ y: -15, transition: { duration: 0.3 } }}
+                  whileHover={hoverTransition}
                 >
                   <CRLabelBadge
                     initial={{ y: -10, opacity: 0 }}
@@ -575,7 +641,7 @@ const Home = () => {
                 </CRCardWrapper>
               )) : (
                 <motion.div variants={itemVariants}>
-                  <CRCardWrapper whileHover={{ y: -15, transition: { duration: 0.3 } }}>
+                  <CRCardWrapper whileHover={hoverTransition}>
                     <CRLabelBadge>Class Representative</CRLabelBadge>
                     <StudentCard 
                       student={{
@@ -591,7 +657,7 @@ const Home = () => {
               
               {(!classReps || classReps.length < 2) && (
                 <motion.div variants={itemVariants}>
-                  <CRCardWrapper whileHover={{ y: -15, transition: { duration: 0.3 } }}>
+                  <CRCardWrapper whileHover={hoverTransition}>
                     <CRLabelBadge>Class Representative</CRLabelBadge>
                     <StudentCard 
                       student={{
@@ -608,14 +674,21 @@ const Home = () => {
         </CRSectionWrapper>
       </SectionWrapper>
       
-      {/* Replace the Features Section with our new PremiumFeatureSection */}
-      <PremiumFeatureSection />
+      {/* PremiumFeatureSection - smooth entry animations */}
+      <SectionWrapper
+        ref={featuresRef}
+        initial="hidden"
+        animate={featuresInView ? "visible" : "hidden"}
+        variants={containerVariants}
+      >
+        <PremiumFeatureSection />
+      </SectionWrapper>
       
-      {/* Featured Students Section */}
+      {/* Featured Students Section - improved animations */}
       <SectionWrapper
         ref={studentsRef}
         initial="hidden"
-        animate={studentControls}
+        animate={studentsInView ? "visible" : "hidden"}
         variants={containerVariants}
       >
         <PremiumFeaturedSection>
@@ -634,7 +707,7 @@ const Home = () => {
                 <motion.div 
                   key={student?.id || `student-${index}`} 
                   variants={itemVariants}
-                  whileHover={{ y: -10, transition: { duration: 0.3 } }}
+                  whileHover={hoverTransition}
                   style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
                 >
                   <StudentCard student={student} />
@@ -653,6 +726,9 @@ const Home = () => {
               variant="premium"
               onMouseEnter={handleButtonHover}
               onClick={handleButtonClick}
+              style={{
+                transition: "all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1.0)",
+              }}
             >
               View All Students
             </Button>
