@@ -26,6 +26,9 @@ const CardContainer = styled(motion.div)`
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
   isolation: isolate;
+  will-change: transform, box-shadow;
+  transform-style: preserve-3d;
+  perspective: 1000px;
   
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 250px;
@@ -69,6 +72,7 @@ const CardContainer = styled(motion.div)`
     pointer-events: none;
     transition: all 0.4s ease;
     animation: borderGlow 3s infinite;
+    z-index: 1;
   }
 
   &:after {
@@ -105,7 +109,7 @@ const CardContainer = styled(motion.div)`
   }
 
   &:hover {
-    transform: translateY(-12px) scale(1.02);
+    transform: translateY(-12px) scale(1.02) rotateY(5deg);
     box-shadow: 
       0 30px 60px rgba(0, 0, 0, 0.5),
       0 0 40px rgba(229, 9, 20, 0.4),
@@ -156,8 +160,28 @@ const CardContainer = styled(motion.div)`
         0 0 20px rgba(229, 9, 20, 0.3);
     }
   }
+  
+  /* Add 3D card tilt effect */
+  &.tilt {
+    transform-style: preserve-3d;
+    transform: perspective(1000px);
+  }
+  
+  &.tilt .card-content {
+    transform-style: preserve-3d;
+  }
 `;
 
+// Add new 3D content wrapper
+const CardContent = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+`;
+
+// Enhance ImageContainer with more 3D effects
 const ImageContainer = styled.div`
   position: relative;
   width: 100%;
@@ -194,8 +218,12 @@ const ImageContainer = styled.div`
   ${CardContainer}:hover &:before {
     opacity: 1;
   }
+  
+  /* Add 3D effect */
+  transform: translateZ(20px);
 `;
 
+// Add the ProfileImage component
 const ProfileImage = styled(motion.div)`
   width: 100%;
   height: 100%;
@@ -206,13 +234,25 @@ const ProfileImage = styled(motion.div)`
   filter: contrast(1.1) brightness(0.9) saturate(1.1);
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
-
+  will-change: transform, filter;
+  
   ${CardContainer}:hover & {
-    transform: scale(1.08);
+    transform: scale(1.08) rotate(1deg);
     filter: contrast(1.2) brightness(1) saturate(1.3);
+    animation: subtleShift 4s ease-in-out infinite alternate;
+  }
+  
+  @keyframes subtleShift {
+    0% {
+      background-position: center;
+    }
+    100% {
+      background-position: center 52%;
+    }
   }
 `;
 
+// Enhance PremiumBadge with more interactive effects
 const PremiumBadge = styled(motion.div)`
   position: absolute;
   top: 1rem;
@@ -230,6 +270,7 @@ const PremiumBadge = styled(motion.div)`
     0 0 0 2px rgba(255, 255, 255, 0.2),
     inset 0 0 8px rgba(255, 165, 0, 0.4);
   animation: float 3s ease-in-out infinite;
+  transform: translateZ(30px);
   
   svg {
     color: white;
@@ -257,10 +298,10 @@ const PremiumBadge = styled(motion.div)`
 
   @keyframes float {
     0%, 100% {
-      transform: translateY(0);
+      transform: translateY(0) translateZ(30px);
     }
     50% {
-      transform: translateY(-5px);
+      transform: translateY(-5px) translateZ(30px);
     }
   }
 
@@ -280,6 +321,7 @@ const PremiumBadge = styled(motion.div)`
   }
 `;
 
+// Enhance ContentContainer with 3D effects
 const ContentContainer = styled(motion.div)`
   position: absolute;
   bottom: 0;
@@ -288,8 +330,9 @@ const ContentContainer = styled(motion.div)`
   padding: 1.8rem;
   z-index: 3;
   background: none;
-  transform: translateY(0);
+  transform: translateY(0) translateZ(15px);
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
 
   &:before {
     content: '';
@@ -307,7 +350,7 @@ const ContentContainer = styled(motion.div)`
   }
 
   ${CardContainer}:hover & {
-    transform: translateY(-8px);
+    transform: translateY(-8px) translateZ(25px);
     
     &:before {
       opacity: 0.9;
@@ -315,14 +358,7 @@ const ContentContainer = styled(motion.div)`
   }
 `;
 
-const UserInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  position: relative;
-  z-index: 2;
-`;
-
+// Update UserName with 3D effect
 const UserName = styled(motion.h3)`
   color: rgba(255, 255, 255, 0.95);
   font-size: 1.3rem;
@@ -333,7 +369,7 @@ const UserName = styled(motion.h3)`
                0 0 20px rgba(229, 9, 20, 0.3);
   letter-spacing: 0.5px;
   line-height: 1.2;
-  transform: translateY(0);
+  transform: translateY(0) translateZ(10px);
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   
@@ -353,7 +389,7 @@ const UserName = styled(motion.h3)`
   }
   
   ${CardContainer}:hover & {
-    transform: translateY(-4px);
+    transform: translateY(-4px) translateZ(20px);
     color: rgba(255, 255, 255, 1);
     text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6),
                  0 2px 12px rgba(0, 0, 0, 0.4),
@@ -365,6 +401,7 @@ const UserName = styled(motion.h3)`
   }
 `;
 
+// Update UserId with 3D effect
 const UserId = styled(motion.span)`
   color: rgba(255, 255, 255, 0.85);
   font-size: 0.95rem;
@@ -373,7 +410,7 @@ const UserId = styled(motion.span)`
   letter-spacing: 0.5px;
   font-weight: 500;
   opacity: 0.9;
-  transform: translateY(0);
+  transform: translateY(0) translateZ(5px);
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   background: linear-gradient(
     90deg,
@@ -384,7 +421,7 @@ const UserId = styled(motion.span)`
   background-clip: text;
   
   ${CardContainer}:hover & {
-    transform: translateY(-4px);
+    transform: translateY(-4px) translateZ(15px);
     opacity: 1;
     background: linear-gradient(
       90deg,
@@ -424,6 +461,14 @@ const DefaultAvatar = styled(motion.div)`
   }
 `;
 
+const UserInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  position: relative;
+  z-index: 2;
+`;
+
 const StudentCard = ({ student, delay = 0, playSound }) => {
   // Safety check - if student is not an object, create a fallback
   const safeStudent = typeof student === 'object' && student !== null ? student : {};
@@ -434,6 +479,29 @@ const StudentCard = ({ student, delay = 0, playSound }) => {
   const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
   const [isBottomHovered, setIsBottomHovered] = useState(false);
   const cardRef = useRef(null);
+
+  // Card tilt effect
+  const handleTilt = (e) => {
+    if (!cardRef.current || window.matchMedia('(max-width: 576px)').matches) return;
+    
+    const card = cardRef.current;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    
+    const rotateX = (centerY - y) / 10;
+    const rotateY = (x - centerX) / 10;
+    
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  };
+  
+  const resetTilt = () => {
+    if (!cardRef.current) return;
+    cardRef.current.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
+  };
 
   useEffect(() => {
     if (safeStudent.image) {
@@ -516,6 +584,9 @@ const StudentCard = ({ student, delay = 0, playSound }) => {
     if (isBottomHalf !== isBottomHovered) {
       setIsBottomHovered(isBottomHalf);
     }
+    
+    // Apply card tilt effect
+    handleTilt(e);
   };
 
   // Add touch event handler
@@ -555,40 +626,44 @@ const StudentCard = ({ student, delay = 0, playSound }) => {
           delay: delay * 0.1
         }}
         onMouseMove={handleMouseMove}
+        onMouseLeave={resetTilt}
         onTouchStart={handleTouch}
         onTouchEnd={() => setIsBottomHovered(false)}
         isBottomHovered={isBottomHovered}
         whileTap={{ scale: 0.98 }}
+        className="tilt"
       >
         <div className="bottom-shadow" />
-        <ImageContainer>
-          {!imageError && imagePath ? (
-            <ProfileImage 
-              image={imagePath}
-              onError={() => setImageError(true)}
-            />
-          ) : (
-            <DefaultAvatar>
-              <FaUser />
-            </DefaultAvatar>
-          )}
-          {safeStudent.role && (
-            <PremiumBadge
-              variants={premiumVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              {getPremiumIcon(safeStudent.role)}
-            </PremiumBadge>
-          )}
-        </ImageContainer>
-        
-        <ContentContainer>
-          <UserInfo>
-            <UserName>{safeStudent.name || `Student ${safeStudent.id || 'Unknown'}`}</UserName>
-            <UserId>ID: {safeStudent.id || 'N/A'}</UserId>
-          </UserInfo>
-        </ContentContainer>
+        <CardContent className="card-content">
+          <ImageContainer>
+            {!imageError && imagePath ? (
+              <ProfileImage 
+                image={imagePath}
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              <DefaultAvatar>
+                <FaUser />
+              </DefaultAvatar>
+            )}
+            {safeStudent.role && (
+              <PremiumBadge
+                variants={premiumVariants}
+                initial="hidden"
+                animate="visible"
+              >
+                {getPremiumIcon(safeStudent.role)}
+              </PremiumBadge>
+            )}
+          </ImageContainer>
+          
+          <ContentContainer>
+            <UserInfo>
+              <UserName>{safeStudent.name || `Student ${safeStudent.id || 'Unknown'}`}</UserName>
+              <UserId>ID: {safeStudent.id || 'N/A'}</UserId>
+            </UserInfo>
+          </ContentContainer>
+        </CardContent>
       </CardContainer>
     </Link>
   );

@@ -7,6 +7,7 @@ import { FaArrowLeft, FaPhone, FaFacebook, FaStar, FaGraduationCap,
   FaUserSlash, FaAddressCard, FaUniversity, FaMapMarkerAlt, FaCalendarAlt, 
   FaUserGraduate, FaChartLine, FaAward, FaFacebookF, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
 import { allStudents } from '../data/students';
+import { useInView } from 'react-intersection-observer';
 
 // Overlay for premium effect
 const PageOverlay = styled(motion.div)`
@@ -25,10 +26,18 @@ const PageOverlay = styled(motion.div)`
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(circle at 15% 50%, rgba(229, 9, 20, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 85% 30%, rgba(229, 9, 20, 0.05) 0%, transparent 50%);
+    background: 
+      radial-gradient(circle at 15% 50%, rgba(229, 9, 20, 0.12) 0%, transparent 60%),
+      radial-gradient(circle at 85% 30%, rgba(229, 9, 20, 0.08) 0%, transparent 60%),
+      radial-gradient(circle at 50% 80%, rgba(229, 9, 20, 0.06) 0%, transparent 60%);
     z-index: -1;
-    opacity: 0.7;
+    opacity: 0.8;
+    animation: pulseGlow 10s ease-in-out infinite alternate;
+  }
+  
+  @keyframes pulseGlow {
+    0% { opacity: 0.6; }
+    100% { opacity: 0.9; }
   }
 `;
 
@@ -77,9 +86,9 @@ const BackButton = styled(motion.button)`
 `;
 
 const ProfileCard = styled(motion.div)`
-  background: linear-gradient(to bottom, rgba(30, 30, 30, 0.95), rgba(15, 15, 15, 0.98));
-  border-radius: 16px;
-  padding: 2.5rem;
+  background: linear-gradient(145deg, rgba(30, 30, 30, 0.95), rgba(15, 15, 15, 0.98));
+  border-radius: 24px;
+  padding: 3rem;
   width: 100%;
   max-width: 900px;
   display: flex;
@@ -88,9 +97,14 @@ const ProfileCard = styled(motion.div)`
   position: relative;
   overflow: hidden;
   border: 1px solid rgba(100, 100, 100, 0.2);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(229, 9, 20, 0.1),
+    inset 0 0 30px rgba(229, 9, 20, 0.05);
   z-index: 2;
   backdrop-filter: blur(10px);
+  transform-style: preserve-3d;
+  perspective: 1000px;
   
   &:before {
     content: '';
@@ -99,7 +113,7 @@ const ProfileCard = styled(motion.div)`
     left: 0;
     right: 0;
     height: 100%;
-    background: linear-gradient(to right, transparent, rgba(229, 9, 20, 0.05), transparent);
+    background: linear-gradient(to right, transparent, rgba(229, 9, 20, 0.08), transparent);
     background-size: 200% 100%;
     animation: shimmer 8s infinite linear;
     pointer-events: none;
@@ -120,17 +134,36 @@ const ProfileCard = styled(motion.div)`
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
   }
+  
+  @media (max-width: 768px) {
+    padding: 2rem 1.5rem;
+    border-radius: 20px;
+  }
+`;
+
+const CircuitPattern = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='none' stroke='rgba(229, 9, 20, 0.1)' stroke-width='1' d='M10,10 L30,10 L30,30 L50,30 L50,50 L70,50 L70,70 L90,70 M90,30 L70,30 L70,50 L50,50 L50,70 L30,70 L30,90 L10,90'/%3E%3C/svg%3E");
+  background-size: 100px 100px;
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: -1;
 `;
 
 const AvatarOuterContainer = styled(motion.div)`
   position: relative;
-  width: 180px;
-  height: 180px;
-  margin-bottom: 1.5rem;
+  width: 200px;
+  height: 200px;
+  margin-bottom: 2rem;
+  z-index: 2;
   
   @media (max-width: 768px) {
-    width: 140px;
-    height: 140px;
+    width: 150px;
+    height: 150px;
   }
 `;
 
@@ -139,12 +172,19 @@ const AvatarGlow = styled(motion.div)`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 110%;
-  height: 110%;
+  width: 120%;
+  height: 120%;
   background: radial-gradient(circle, rgba(229, 9, 20, 0.5) 0%, rgba(0, 0, 0, 0) 70%);
   border-radius: 50%;
   z-index: 0;
-  filter: blur(10px);
+  filter: blur(15px);
+  opacity: 0.8;
+  animation: pulseAvatar 3s ease-in-out infinite alternate;
+  
+  @keyframes pulseAvatar {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+    100% { transform: translate(-50%, -50%) scale(1.15); opacity: 0.9; }
+  }
 `;
 
 const AvatarContainer = styled(motion.div)`
@@ -156,13 +196,19 @@ const AvatarContainer = styled(motion.div)`
   border: 4px solid #E50914;
   z-index: 1;
   background-color: #181818;
-  box-shadow: 0 0 25px rgba(229, 9, 20, 0.6);
+  box-shadow: 
+    0 0 25px rgba(229, 9, 20, 0.6),
+    inset 0 0 20px rgba(0, 0, 0, 0.8);
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform-style: preserve-3d;
   
   &:hover {
-    transform: scale(1.08);
-    box-shadow: 0 0 35px rgba(229, 9, 20, 0.8);
+    transform: scale(1.08) translateZ(20px);
+    box-shadow: 
+      0 0 35px rgba(229, 9, 20, 0.8),
+      inset 0 0 25px rgba(0, 0, 0, 0.8);
     border-color: #FF0A16;
+    border-width: 5px;
   }
   
   &::after {
@@ -174,15 +220,17 @@ const AvatarContainer = styled(motion.div)`
     bottom: 0;
     border-radius: 50%;
     box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
     pointer-events: none;
   }
   
   img {
-    transition: transform 0.5s ease;
+    transition: transform 0.5s ease, filter 0.5s ease;
   }
   
   &:hover img {
-    transform: scale(1.1);
+    transform: scale(1.1) rotate(2deg);
+    filter: contrast(1.1) brightness(1.1);
   }
 `;
 
@@ -192,19 +240,43 @@ const StatusBadge = styled(motion.div)`
   right: 0;
   background: linear-gradient(135deg, #E50914, #B20710);
   color: white;
-  font-size: 0.8rem;
-  padding: 0.3rem 0.6rem;
-  border-radius: 12px;
+  font-size: 0.9rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 14px;
   font-weight: bold;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
   transform-origin: bottom right;
   letter-spacing: 1px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  z-index: 2;
+  
+  &:before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #E50914, transparent, #E50914);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+  }
+  
+  &:hover:before {
+    opacity: 0.8;
+    animation: rotateBorder 3s linear infinite;
+  }
+  
+  @keyframes rotateBorder {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
 `;
 
 const StudentName = styled(motion.h1)`
   font-family: 'Montserrat', sans-serif;
-  font-size: 2.5rem;
+  font-size: 2.8rem;
   font-weight: 800;
   margin: 0.5rem 0;
   text-align: center;
@@ -213,10 +285,27 @@ const StudentName = styled(motion.h1)`
   -webkit-background-clip: text;
   color: transparent;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
+  position: relative;
+  
+  &:after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #E50914, transparent);
+    transition: width 0.5s ease;
+  }
+  
+  &:hover:after {
+    width: 80%;
+  }
   
   @media (max-width: 768px) {
-    font-size: 2rem;
+    font-size: 2.2rem;
   }
 `;
 
@@ -1149,6 +1238,12 @@ const StudentProfile = () => {
     }
   }, [isMounted, loading, student]);
   
+  // Add intersection observer for animate-on-scroll
+  const [profileRef, inView] = useInView({
+    threshold: 0.1,
+    triggerOnce: true
+  });
+  
   if (loading) {
     return (
       <LoadingContainer>
@@ -1239,43 +1334,25 @@ const StudentProfile = () => {
           boxShadow: ["0 20px 50px rgba(0, 0, 0, 0.8)", "0 25px 60px rgba(229, 9, 20, 0.2), 0 25px 60px rgba(0, 0, 0, 0.8)", "0 20px 50px rgba(0, 0, 0, 0.8)"],
           transition: { duration: 5, repeat: Infinity, repeatType: "reverse" }
         }}
+        ref={profileRef}
       >
-        <AvatarOuterContainer 
-          variants={itemVariants}
-          initial={{ scale: 0.8, opacity: 0, y: 20 }}
-          animate={{ 
-            scale: 1, 
-            opacity: 1,
-            y: 0,
-            transition: {
-              type: "spring",
-              stiffness: 400,
-              damping: 15,
-              delay: 0.4
-            }
-          }}
-          {...floatAnimation}
-        >
-          <AvatarGlow 
-            animate={{ 
-              opacity: [0.5, 0.9, 0.5], 
-              scale: [1, 1.15, 1],
-              filter: ["blur(10px)", "blur(15px)", "blur(10px)"]
+        <CircuitPattern />
+        
+        <AvatarOuterContainer>
+          <AvatarGlow
+            animate={{
+              opacity: [0.6, 0.9, 0.6],
+              scale: [1, 1.1, 1],
             }}
-            transition={{ 
-              duration: 4, 
+            transition={{
+              duration: 4,
               repeat: Infinity,
-              repeatType: "mirror",
-              ease: "easeInOut"
+              repeatType: "reverse",
             }}
           />
           <AvatarContainer
-            whileHover={{ scale: 1.12, boxShadow: "0 0 40px rgba(229, 9, 20, 0.8)" }}
-            whileTap={{ scale: 0.95 }}
-            animate={{ 
-              boxShadow: ["0 0 25px rgba(229, 9, 20, 0.4)", "0 0 35px rgba(229, 9, 20, 0.7)", "0 0 25px rgba(229, 9, 20, 0.4)"],
-              transition: { duration: 3, repeat: Infinity, repeatType: "mirror" }
-            }}
+            whileHover={{ scale: 1.08 }}
+            transition={{ type: "spring", stiffness: 300, damping: 10 }}
           >
             {student && student.image ? (
               <img 
@@ -1341,9 +1418,9 @@ const StudentProfile = () => {
               ease: [0.25, 0.1, 0.25, 1.0]
             }
           }}
-          whileHover={{ scale: 1.05, letterSpacing: "1.5px", textShadow: "0 0 15px rgba(229, 9, 20, 0.5)" }}
+          whileHover={{ scale: 1.05, letterSpacing: "2px", textShadow: "0 0 15px rgba(229, 9, 20, 0.5)" }}
         >
-          {student.name}
+          {student?.name || 'Loading...'}
         </StudentName>
         
         <StudentId 
