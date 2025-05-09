@@ -1339,13 +1339,13 @@ const StudentProfile = () => {
         <CircuitPattern />
         
         <AvatarOuterContainer>
-          <AvatarGlow
-            animate={{
+          <AvatarGlow 
+            animate={{ 
               opacity: [0.6, 0.9, 0.6],
               scale: [1, 1.1, 1],
             }}
-            transition={{
-              duration: 4,
+            transition={{ 
+              duration: 4, 
               repeat: Infinity,
               repeatType: "reverse",
             }}

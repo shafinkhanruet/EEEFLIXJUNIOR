@@ -6,29 +6,40 @@ import { AudioContext } from '../contexts/AudioContext';
 const MusicControlContainer = styled(motion.div)`
   position: fixed;
   bottom: 20px;
-  right: 20px;
+  left: 20px;
   z-index: 99;
   display: flex;
   flex-direction: column;
   align-items: center;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+  
+  /* For mobile devices, keep it at bottom left */
+  @media (max-width: 768px) {
+    bottom: 20px;
+    left: 20px;
+  }
+  
+  &:hover {
+    opacity: 1;
+  }
 `;
 
 const MusicButton = styled(motion.button)`
-  width: 48px;
-  height: 48px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: rgba(20, 20, 20, 0.8);
+  background: rgba(20, 20, 20, 0.6);
   backdrop-filter: blur(5px);
-  border: 1px solid rgba(229, 9, 20, 0.7);
+  border: 1px solid rgba(229, 9, 20, 0.5);
   color: white;
-  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
   position: relative;
   overflow: hidden;
-  opacity: ${props => props.disabled ? 0.7 : 1};
   
   &:focus {
     outline: none;
@@ -55,14 +66,14 @@ const MusicIcon = styled.div`
 const VolumeControl = styled(motion.div)`
   width: 100px;
   height: 28px;
-  background: rgba(20, 20, 20, 0.8);
+  background: rgba(20, 20, 20, 0.6);
   backdrop-filter: blur(5px);
   border-radius: 14px;
   margin-bottom: 10px;
   display: flex;
   align-items: center;
   padding: 0 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
   border: 1px solid rgba(229, 9, 20, 0.4);
 `;
 
@@ -130,37 +141,23 @@ const MusicLabel = styled(motion.div)`
 
 const MusicStatus = styled(motion.div)`
   position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 8px;
-  height: 8px;
+  top: 4px;
+  right: 4px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
-  background-color: ${props => props.active ? '#E50914' : '#666'};
-`;
-
-// Add loading indicator styled component
-const LoadingIndicator = styled(motion.div)`
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top: 2px solid white;
-  border-radius: 50%;
+  background-color: #E50914;
 `;
 
 const MusicControl = () => {
   const { 
     isMusicPlaying, 
-    isMusicMuted, 
     volume, 
-    toggleMusic, 
-    toggleMute, 
-    setMusicVolume,
-    audioLoaded 
+    setMusicVolume
   } = useContext(AudioContext);
   
   const [showVolumeControl, setShowVolumeControl] = useState(false);
   const [showLabel, setShowLabel] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   
   // Bar heights for equalizer animation
   const barHeights = [
@@ -186,43 +183,16 @@ const MusicControl = () => {
     }
   };
   
-  // Loading animation
-  const loadingVariants = {
-    animate: {
-      rotate: 360,
-      transition: {
-        duration: 1,
-        repeat: Infinity,
-        ease: "linear"
-      }
-    }
-  };
-  
   // Handle volume change
   const handleVolumeChange = (e) => {
     const newVolume = parseInt(e.target.value, 10) / 100;
     setMusicVolume(newVolume);
   };
-
-  // Handle music toggle with loading state
-  const handleMusicToggle = () => {
-    if (!audioLoaded) {
-      setIsLoading(true);
-    }
-    toggleMusic();
-  };
-  
-  // Reset loading state when audio is loaded or playing changes
-  useEffect(() => {
-    if (audioLoaded || isMusicPlaying) {
-      setIsLoading(false);
-    }
-  }, [audioLoaded, isMusicPlaying]);
   
   return (
     <MusicControlContainer
       initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      animate={{ opacity: 0.7, y: 0 }}
       transition={{ 
         duration: 0.5, 
         delay: 1,
@@ -249,14 +219,16 @@ const MusicControl = () => {
       </AnimatePresence>
       
       <MusicButton
-        whileHover={{ scale: 1.1, translateZ: 0 }}
-        whileTap={{ scale: 0.95, translateZ: 0 }}
-        onClick={handleMusicToggle}
-        onMouseEnter={() => setShowLabel(true)}
-        onMouseLeave={() => setShowLabel(false)}
-        onFocus={() => setShowVolumeControl(true)}
-        onBlur={() => setShowVolumeControl(false)}
-        disabled={isLoading}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        onMouseEnter={() => {
+          setShowLabel(true);
+          setShowVolumeControl(true);
+        }}
+        onMouseLeave={() => {
+          setShowLabel(false);
+          setShowVolumeControl(false);
+        }}
       >
         <AnimatePresence>
           {showLabel && (
@@ -264,42 +236,27 @@ const MusicControl = () => {
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 5 }}
-              transition={{ 
-                duration: 0.2,
-                ease: [0.33, 1, 0.68, 1]
-              }}
+              transition={{ duration: 0.2 }}
             >
-              {isLoading ? 'Loading...' : isMusicPlaying ? 'Pause Music' : 'Play Music'}
+              Now Playing
             </MusicLabel>
           )}
         </AnimatePresence>
         
-        <MusicStatus active={isMusicPlaying} />
+        <MusicStatus />
         
         <MusicIcon>
-          {isLoading ? (
-            <LoadingIndicator 
-              variants={loadingVariants}
-              animate="animate"
-            />
-          ) : isMusicPlaying ? (
-            <EqualizerBars>
-              {[0, 1, 2, 3, 4].map((i) => (
-                <Bar
-                  key={i}
-                  custom={i}
-                  variants={variants}
-                  animate="playing"
-                  initial="paused"
-                />
-              ))}
-            </EqualizerBars>
-          ) : (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="white" strokeWidth="2"/>
-              <path d="M9.5 8.5L16.5 12L9.5 15.5V8.5Z" fill="white" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          )}
+          <EqualizerBars>
+            {[0, 1, 2, 3, 4].map((i) => (
+              <Bar
+                key={i}
+                custom={i}
+                variants={variants}
+                animate="playing"
+                initial="paused"
+              />
+            ))}
+          </EqualizerBars>
         </MusicIcon>
       </MusicButton>
     </MusicControlContainer>

@@ -290,7 +290,7 @@ const Navbar = ({ scrolled: propScrolled, toggleDigitalOverlay }) => {
   // Set default sound functions to prevent errors
   const playSound = soundContext?.playSound || (() => {});
   const [logoLoaded, setLogoLoaded] = useState(true);
-  
+
   // Use the scroll optimizer hook for better performance
   const { scrollPosition, scrollDirection } = useScrollOptimizer();
 
@@ -305,10 +305,10 @@ const Navbar = ({ scrolled: propScrolled, toggleDigitalOverlay }) => {
     
     // Update scrolled state
     if (scrollPosition.y > 50) {
-      setScrolled(true);
-    } else {
-      setScrolled(false);
-    }
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
   }, [scrollPosition, scrollDirection, mobileMenuOpen]);
 
   const handleLinkClick = () => {

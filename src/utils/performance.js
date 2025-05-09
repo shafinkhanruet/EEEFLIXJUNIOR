@@ -26,8 +26,8 @@ export const debounce = (callback, delay = 100) => {
       callback(...args);
     }, delay);
   };
-};
-
+    };
+    
 // RAF (requestAnimationFrame) based throttle for smoother animations
 export const rafThrottle = (callback) => {
   let scheduled = false;
@@ -40,7 +40,7 @@ export const rafThrottle = (callback) => {
     requestAnimationFrame(() => {
       callback(...args);
       scheduled = false;
-    });
+  });
   };
 };
 
@@ -79,7 +79,7 @@ export const detectBrowserCapabilities = () => {
   
   // Device pixel ratio
   capabilities.devicePixelRatio = window.devicePixelRatio || 1;
-  
+
   // High/low end device detection
   // Simple heuristic based on pixel ratio and memory
   if (navigator.deviceMemory) {

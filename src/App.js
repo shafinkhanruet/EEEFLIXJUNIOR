@@ -161,13 +161,50 @@ function App() {
   
   // Always show digital overlay - remove the toggle state
   
-  // Create a simple sound context value with disabled functionality
+  // Create a sound context value with enabled functionality
   const soundContextValue = {
-    soundEnabled: false,
-    setSoundEnabled: () => {},
-    playSound: () => {}
+    soundEnabled: true, // Always enabled
+    playSound: (sound) => {
+      // Simple sound playing function that always plays the sound
+      try {
+        const audio = new Audio(`/assets/sounds/${sound}.mp3`);
+        audio.volume = 0.5;
+        audio.play().catch(err => console.warn('Could not play sound:', err));
+      } catch (error) {
+        console.warn('Error playing sound:', error);
+      }
+    }
   };
   
+  // Preload and autoplayer background audio
+  useEffect(() => {
+    // Only attempt to play audio when UI is shown to avoid autoplay restrictions
+    if (showUI) {
+      try {
+        // Create ambient background sound
+        const backgroundAudio = new Audio('/assets/sounds/ambient.mp3');
+        backgroundAudio.volume = 0.1;
+        backgroundAudio.loop = true;
+        
+        // Play the sound with a slight delay to avoid competing with other resources
+        const audioTimer = setTimeout(() => {
+          backgroundAudio.play().catch(error => {
+            console.warn('Could not autoplay background audio:', error);
+          });
+        }, 1000);
+        
+        // Clean up on component unmount
+        return () => {
+          clearTimeout(audioTimer);
+          backgroundAudio.pause();
+          backgroundAudio.src = '';
+        };
+      } catch (error) {
+        console.warn('Error setting up background audio:', error);
+      }
+    }
+  }, [showUI]);
+
   useEffect(() => {
     // Immediately start loading the main content
     setContentReady(true);
@@ -244,27 +281,27 @@ function App() {
   return (
     <ThemeProvider theme={darkTheme}>
       <AudioProvider>
-        <SoundContext.Provider value={soundContextValue}>
-          <TransitionStyle />
-          <DigitalOverlays />
-          <AppContainer>
-            <BackgroundContainer />
-            
+      <SoundContext.Provider value={soundContextValue}>
+        <TransitionStyle />
+        <DigitalOverlays />
+        <AppContainer>
+          <BackgroundContainer />
+          
             {/* Digital effects */}
             {ENABLE_PREMIUM_DIGITAL_EFFECTS && (
               <>
-                <Scanline
+          <Scanline
                   variants={scanlineVariants}
                   initial="initial"
                   animate="animate"
-                  transition={{
-                    repeat: Infinity,
+            transition={{
+              repeat: Infinity,
                     duration: 5,
                     ease: "linear"
-                  }}
-                />
-                <DigitalGrid />
-                <CRTFlicker />
+            }}
+          />
+          <DigitalGrid />
+          <CRTFlicker />
                 <DigitalOverlay enabled={true} />
               </>
             )}
@@ -280,7 +317,7 @@ function App() {
                 </Suspense>
               )}
             </AnimatePresence>
-            
+          
             {/* Main app content */}
             <AnimatePresence mode="wait">
               {showUI && contentReady && (
@@ -292,9 +329,9 @@ function App() {
                   style={{ width: '100%', height: '100%' }}
                 >
                   <Navbar scrolled={location.pathname !== '/'} />
-                  
-                  <MainContent>
-                    <AnimatePresence mode="wait">
+              
+              <MainContent>
+                <AnimatePresence mode="wait">
                       <PageTransition
                         key={location.pathname}
                         initial={{ opacity: 0, filter: "blur(8px)" }}
@@ -332,25 +369,25 @@ function App() {
                             </Suspense>
                           } />
                           <Route path="/resources" element={
-                            <Suspense fallback={<LoadingSpinner />}>
+                  <Suspense fallback={<LoadingSpinner />}>
                               <Resources />
                             </Suspense>
                           } />
-                        </Routes>
+                    </Routes>
                       </PageTransition>
-                    </AnimatePresence>
-                  </MainContent>
-                  
-                  <Footer />
+                </AnimatePresence>
+              </MainContent>
+              
+              <Footer />
                   <MusicControl />
                   <ScrollToTop />
                 </motion.div>
-              )}
-            </AnimatePresence>
+            )}
+          </AnimatePresence>
             
             {!showSplash && !showUI && <LoadingSpinner />}
-          </AppContainer>
-        </SoundContext.Provider>
+        </AppContainer>
+      </SoundContext.Provider>
       </AudioProvider>
     </ThemeProvider>
   );

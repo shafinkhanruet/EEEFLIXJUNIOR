@@ -675,7 +675,7 @@ const StudentCard = ({ student, delay = 0, playSound }) => {
 
   return (
     <Link 
-      to={safeStudent.id ? `/students/${encodeURIComponent(safeStudent.id)}` : '#'} 
+      to={safeStudent.id ? `/student/${encodeURIComponent(safeStudent.id)}` : '#'} 
       style={{ textDecoration: 'none' }}
       onClick={(e) => {
         if (!safeStudent.id) {

@@ -13,7 +13,7 @@ import ParallaxBackground from '../components/ParallaxBackground';
 import PremiumFeatureSection from '../components/PremiumFeatureSection';
 
 // Mock data
-import { featuredStudents } from '../data/students';
+import { featuredStudents, allStudents } from '../data/students';
 
 // Styled Components
 const PageContainer = styled.div`
@@ -491,7 +491,49 @@ const Home = () => {
   useEffect(() => {
     // Ensure featuredStudents is an array and set it to state
     if (featuredStudents && Array.isArray(featuredStudents)) {
-      setStudents(featuredStudents);
+      // First, get the featured students
+      let studentsToShow = [...featuredStudents];
+      
+      // Find Shafin Khan in the featured students by id or name
+      const shafinIndex = studentsToShow.findIndex(student => 
+        student.id === '2301030' || 
+        (student.name && student.name.includes('SHAFIN'))
+      );
+      
+      // If Shafin Khan is not already in the array, create a fallback student
+      if (shafinIndex === -1) {
+        // Create a fallback student for Shafin if he can't be found
+        const shafinKhan = {
+          id: '2301030',
+          name: 'MD. SHAFIN KHAN',
+          role: 'Developer',
+          image: '/assets/images/avatar/avatar-30.jpg',
+          description: 'Developer of the EEEFLIX platform',
+          year: '2023',
+          semester: 'Spring'
+        };
+        
+        // If we have 4 or more students, replace one with Shafin
+        if (studentsToShow.length >= 4) {
+          // Replace a student that is not a CR with Shafin
+          const replaceIndex = Math.floor(Math.random() * Math.min(studentsToShow.length, 4));
+          studentsToShow[replaceIndex] = shafinKhan;
+        } else {
+          // Otherwise just add Shafin
+          studentsToShow.push(shafinKhan);
+        }
+      } else if (shafinIndex >= 4) {
+        // If Shafin is in the array but beyond index 3, swap him with a student in the first 4
+        const shafinStudent = studentsToShow[shafinIndex];
+        const replaceIndex = Math.floor(Math.random() * 4);
+        studentsToShow[shafinIndex] = studentsToShow[replaceIndex];
+        studentsToShow[replaceIndex] = shafinStudent;
+      }
+      
+      // Ensure we only show the first 4 students
+      studentsToShow = studentsToShow.slice(0, 4);
+      
+      setStudents(studentsToShow);
     } else {
       // If featuredStudents is not available or not an array, use an empty array
       console.error('featuredStudents is not an array or is undefined');
@@ -604,7 +646,7 @@ const Home = () => {
       
       {/* Hero Section with ref for inView animation */}
       <div ref={heroRef}>
-        <Hero />
+      <Hero />
       </div>
       
       {/* Class Representatives Section - enhanced animations */}
@@ -681,7 +723,7 @@ const Home = () => {
         animate={featuresInView ? "visible" : "hidden"}
         variants={containerVariants}
       >
-        <PremiumFeatureSection />
+      <PremiumFeatureSection />
       </SectionWrapper>
       
       {/* Featured Students Section - improved animations */}
@@ -703,7 +745,7 @@ const Home = () => {
           
           <FeaturedStudentsGrid>
             {students && students.length > 0 ? 
-              students.slice(0, 4).map((student, index) => (
+              students.map((student, index) => (
                 <motion.div 
                   key={student?.id || `student-${index}`} 
                   variants={itemVariants}

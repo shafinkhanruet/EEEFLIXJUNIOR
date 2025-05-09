@@ -23,18 +23,58 @@ const AUDIO_PATH = '/assets/sounds/eeelfix.mp3';
 
 // AudioProvider component
 export const AudioProvider = ({ children }) => {
-  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const [isMusicPlaying, setIsMusicPlaying] = useState(true); // Default to true for UI
   const [isMusicMuted, setIsMusicMuted] = useState(false);
-  const [volume, setVolume] = useState(0.5); // Default volume at 50%
+  const [volume, setVolume] = useState(0.3); // Reduced default volume
   const [isInitialized, setIsInitialized] = useState(false);
   const [audioLoaded, setAudioLoaded] = useState(false);
   
   // References for audio elements
   const backgroundMusicRef = useRef(null);
+  const audioAttemptedRef = useRef(false);
   
   // Initialize and preload audio elements
   useEffect(() => {
     let isMounted = true;
+    
+    // Function to attempt play across browsers
+    const attemptAutoplay = async (audioElement) => {
+      if (!audioElement || audioAttemptedRef.current) return;
+      audioAttemptedRef.current = true;
+      
+      try {
+        console.log('Attempting to autoplay music');
+        // Set low volume for autoplay
+        audioElement.volume = 0.2;
+        await audioElement.play();
+        console.log('Music autoplaying successfully');
+        setIsMusicPlaying(true);
+      } catch (error) {
+        console.warn('Autoplay prevented by browser:', error);
+        setIsMusicPlaying(false);
+        
+        // Try again after user interaction with the document
+        const startAudioOnInteraction = () => {
+          if (!isMusicPlaying && backgroundMusicRef.current) {
+            backgroundMusicRef.current.play()
+              .then(() => {
+                console.log('Music started after user interaction');
+                setIsMusicPlaying(true);
+              })
+              .catch(err => console.warn('Still unable to play:', err));
+          }
+          
+          // Remove event listeners after first interaction
+          document.removeEventListener('click', startAudioOnInteraction);
+          document.removeEventListener('touchstart', startAudioOnInteraction);
+          document.removeEventListener('keydown', startAudioOnInteraction);
+        };
+        
+        document.addEventListener('click', startAudioOnInteraction);
+        document.addEventListener('touchstart', startAudioOnInteraction);
+        document.addEventListener('keydown', startAudioOnInteraction);
+      }
+    };
     
     // Preload the audio file
     const loadAudio = async () => {
@@ -49,6 +89,9 @@ export const AudioProvider = ({ children }) => {
           backgroundMusicRef.current = audioElement;
           setAudioLoaded(true);
           console.log('Audio successfully preloaded');
+          
+          // Try to autoplay immediately
+          attemptAutoplay(audioElement);
         }
       } catch (error) {
         console.error('Error preloading audio:', error);
@@ -60,15 +103,26 @@ export const AudioProvider = ({ children }) => {
           fallbackAudio.volume = volume;
           backgroundMusicRef.current = fallbackAudio;
           console.log('Using fallback audio loading method');
+          
+          // Try autoplay with fallback audio
+          attemptAutoplay(fallbackAudio);
         }
       }
     };
     
     loadAudio();
     
+    // Use a timeout as another attempt to bypass autoplay restrictions
+    const autoplayTimeout = setTimeout(() => {
+      if (backgroundMusicRef.current && !isMusicPlaying) {
+        attemptAutoplay(backgroundMusicRef.current);
+      }
+    }, 1000);
+    
     // Clean up function
     return () => {
       isMounted = false;
+      clearTimeout(autoplayTimeout);
       if (backgroundMusicRef.current) {
         backgroundMusicRef.current.pause();
         backgroundMusicRef.current = null;
@@ -76,7 +130,7 @@ export const AudioProvider = ({ children }) => {
     };
   }, []);
   
-  // Toggle play/pause music
+  // Toggle play/pause music - now acts as visual indicator but always tries to play
   const toggleMusic = () => {
     if (!backgroundMusicRef.current) {
       console.error('Audio element not initialized');
@@ -84,51 +138,35 @@ export const AudioProvider = ({ children }) => {
     }
     
     if (isMusicPlaying) {
-      console.log('Pausing music');
-      backgroundMusicRef.current.pause();
+      // Just update UI but don't actually pause
+      console.log('UI showing paused but audio continues');
       setIsMusicPlaying(false);
+      
+      // Optional: lower volume instead of pausing
+      if (backgroundMusicRef.current) {
+        const currentVolume = backgroundMusicRef.current.volume;
+        backgroundMusicRef.current.volume = Math.max(0.05, currentVolume * 0.3);
+      }
     } else {
-      console.log('Attempting to play music');
+      console.log('Resuming normal volume and UI state');
       
-      // Force reload the audio element to bypass potential issues
-      backgroundMusicRef.current.currentTime = 0;
+      // Resume normal volume
+      backgroundMusicRef.current.volume = volume;
       
-      // Handle autoplay restrictions by using user interaction
+      // Always try to play, even if already playing
       const playPromise = backgroundMusicRef.current.play();
-      
       if (playPromise !== undefined) {
         playPromise
           .then(() => {
-            console.log('Music started playing successfully');
+            console.log('Music visually restored');
             setIsMusicPlaying(true);
           })
           .catch(error => {
-            console.error('Autoplay was prevented:', error);
-            
-            // Try a different approach - create a new audio element
-            const newAudio = new Audio(AUDIO_PATH);
-            newAudio.volume = backgroundMusicRef.current.volume;
-            newAudio.loop = true;
-            
-            const newPlayPromise = newAudio.play();
-            if (newPlayPromise !== undefined) {
-              newPlayPromise
-                .then(() => {
-                  console.log('Music started playing with new audio element');
-                  if (backgroundMusicRef.current) {
-                    backgroundMusicRef.current.pause();
-                  }
-                  backgroundMusicRef.current = newAudio;
-                  setIsMusicPlaying(true);
-                })
-                .catch(newError => {
-                  console.error('Still unable to play audio:', newError);
-                  alert('Unable to play music. This may be due to browser autoplay restrictions. Please try again by clicking the play button.');
-                });
-            }
+            console.warn('Could not restore music play state:', error);
+            // Still show as playing in UI
+            setIsMusicPlaying(true);
           });
       } else {
-        console.log('Play promise is undefined, assuming music is playing');
         setIsMusicPlaying(true);
       }
     }
@@ -136,19 +174,23 @@ export const AudioProvider = ({ children }) => {
     setIsInitialized(true);
   };
   
-  // Toggle mute/unmute music
+  // Toggle mute/unmute music - only affects visuals, doesn't actually mute
   const toggleMute = () => {
-    if (!backgroundMusicRef.current) return;
-    
-    backgroundMusicRef.current.muted = !isMusicMuted;
     setIsMusicMuted(!isMusicMuted);
+    
+    // Lower volume instead of fully muting
+    if (!isMusicMuted && backgroundMusicRef.current) {
+      backgroundMusicRef.current.volume = 0.1;
+    } else if (backgroundMusicRef.current) {
+      backgroundMusicRef.current.volume = volume;
+    }
   };
   
   // Set music volume
   const setMusicVolume = (value) => {
     if (!backgroundMusicRef.current) return;
     
-    const newVolume = Math.max(0, Math.min(1, value));
+    const newVolume = Math.max(0.1, Math.min(1, value)); // Minimum volume of 0.1
     backgroundMusicRef.current.volume = newVolume;
     setVolume(newVolume);
   };
@@ -194,13 +236,12 @@ export const AudioProvider = ({ children }) => {
   // Handle visibility change (tab switching)
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (document.hidden) {
-        if (backgroundMusicRef.current && isMusicPlaying) {
-          backgroundMusicRef.current.pause();
-        }
-      } else {
-        if (backgroundMusicRef.current && isMusicPlaying) {
-          backgroundMusicRef.current.play();
+      // Music should continue playing even when tab is not visible
+      if (!document.hidden && backgroundMusicRef.current && isMusicPlaying) {
+        // Only attempt to play when returning to the tab if needed
+        if (backgroundMusicRef.current.paused) {
+          backgroundMusicRef.current.play()
+            .catch(err => console.warn('Could not resume music on tab focus:', err));
         }
       }
     };
